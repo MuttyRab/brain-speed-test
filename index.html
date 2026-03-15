@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Processing Speed Test Battery</title>
+<style>
+  :root{
+    --bg1: #0f1724;
+    --bg2: #081226;
+    --card:#0b1220cc;
+    --accent: #8be9fd;
+    --accent-2:#7bd389;
+    --glass: rgba(255,255,255,0.035);
+    --glass-2: rgba(255,255,255,0.02);
+    --muted: rgba(255,255,255,0.6);
+    --success: #2ecc71;
+    --danger: #ff6b6b;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  html,body{height:100%;margin:0;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:#e6eef8;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  .wrap{
+    max-width:1100px;margin:28px auto;padding:28px; display:grid; gap:20px;
+  }
+  header{
+    display:flex;gap:16px;align-items:center;
+  }
+  .logo{
+    width:74px;height:74px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 8px 30px rgba(0,0,0,0.5), inset 0 -6px 20px rgba(255,255,255,0.06);
+    font-weight:700;font-size:20px;color:#04212b;
+  }
+  h1{margin:0;font-size:20px;letter-spacing:-0.2px;}
+  p.lead{margin:0;color:var(--muted);font-size:13.5px}
+  main{display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;}
+  nav.card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:14px;padding:18px;backdrop-filter: blur(6px);box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+    border:1px solid rgba(255,255,255,0.04);
+  }
+  .test-btn{display:block;padding:10px 12px;border-radius:10px;margin:10px 0;background:var(--glass);border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:inherit;text-align:left;}
+  .test-btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .test-btn strong{display:block;font-size:14px}
+  .muted{color:var(--muted)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .btn{
+    padding:10px 14px;border-radius:10px;background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#04212b;font-weight:700;border:none;cursor:pointer;
+    box-shadow:0 8px 20px rgba(11,25,34,0.5);
+  }
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);font-weight:600}
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px;padding:18px;backdrop-filter: blur(6px); border:1px solid rgba(255,255,255,0.035);}
+  .center{display:flex;align-items:center;justify-content:center;flex-direction:column}
+  .stimulus{
+    width:420px;height:280px;border-radius:12px;background:var(--glass);display:flex;align-items:center;justify-content:center;
+    margin:10px auto;font-size:56px; color:#02121a; user-select:none;
+  }
+  .stimulus .circle{width:110px;height:110px;border-radius:999px;background:linear-gradient(180deg,#fff,#dff7fb);box-shadow:0 8px 30px rgba(3,10,14,0.6); display:flex;align-items:center;justify-content:center;font-size:14px;color:#04212b}
+  .progress{height:10px;background:var(--glass-2);border-radius:8px;overflow:hidden;margin-top:10px}
+  .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0%}
+  footer{color:var(--muted);font-size:13px;text-align:center;margin-top:6px}
+  label.small{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+  input[type=number], select{
+    width:100%;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:inherit;
+  }
+  .results{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+  .metric{background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:12px;border-radius:10px;text-align:center}
+  .metric .n{font-weight:800;font-size:20px}
+  .small-muted{font-size:12px;color:var(--muted)}
+  .hist{width:100%;height:120px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));border-radius:8px;padding:8px}
+  .export{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  /* responsive */
+  @media (max-width:980px){
+    main{grid-template-columns:1fr}
+    .stimulus{width:100%;height:220px;font-size:40px}
+  }
+  /* subtle button focus */
+  .btn:focus, .test-btn:focus, input:focus, select:focus{outline:3px solid rgba(123,211,137,0.12);outline-offset:2px}
+  .instructions{font-size:14px;color:var(--muted);line-height:1.45}
+  .kbd{background:#0b1b24;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.03);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap" role="application" aria-label="Processing speed test battery">
+  <header>
+    <div class="logo" aria-hidden="true">PS</div>
+    <div>
+      <h1>Processing-Speed Test Battery</h1>
+      <p class="lead">Fast, precise reaction and attention tasks inspired by classic cognitive research. High-precision timing, results & CSV export.</p>
+    </div>
+  </header>
+
+  <main>
+    <nav class="card" aria-labelledby="menu-title">
+      <h2 id="menu-title" style="font-size:16px;margin:0 0 10px 0">Select test</h2>
+      <button class="test-btn" id="btn-simple" data-test="simple"><strong>Simple Reaction Time</strong><span class="muted">Click/tap as soon as the circle appears. Measures basic processing & motor speed.</span></button>
+      <button class="test-btn" id="btn-choice" data-test="choice"><strong>Choice Reaction Time</strong><span class="muted">Press ← or → (or click buttons) depending on arrow direction. Measures decision time.</span></button>
+      <button class="test-btn" id="btn-stroop" data-test="stroop"><strong>Stroop Color-Word</strong><span class="muted">Report ink color, ignoring the word. Measures selective attention & inhibition.</span></button>
+      <button class="test-btn" id="btn-flanker" data-test="flanker"><strong>Flanker Task</strong><span class="muted">Respond to center arrow while ignoring flankers. Measures selective attention & conflict processing.</span></button>
+      <button class="test-btn" id="btn-search" data-test="search"><strong>Visual Search</strong><span class="muted">Find the target among distractors. Measures perceptual speed & search efficiency.</span></button>
+      <button class="test-btn" id="btn-battery" data-test="battery"><strong>Full Battery</strong><span class="muted">Run all tasks in sequence for a composite measure.</span></button>
+
+      <div style="margin-top:14px">
+        <label class="small">Trials per test (default 12)</label>
+        <input id="trialCount" type="number" min="4" max="50" value="12" />
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="start-btn">Start Selected</button>
+        <button class="btn ghost" id="practice-btn">Practice (3)</button>
+        <button class="btn ghost" id="export-all-btn">Export All Results</button>
+      </div>
+
+      <div style="margin-top:12px" class="small-muted">Tip: Use a full-screen browser window and a mouse or keyboard for best precision. Mobile touch is supported but slightly more variable.</div>
+    </nav>
+
+    <section class="panel" id="runner" aria-live="polite">
+      <div class="center">
+        <div id="stage" class="stimulus" role="region" aria-label="Test stimulus">
+          <div style="text-align:center">
+            <div style="font-weight:700;font-size:20px">Welcome</div>
+            <div class="muted" style="margin-top:6px">Choose a test and press <span class="kbd">Start Selected</span>.</div>
+          </div>
+        </div>
+
+        <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+        <div style="width:100%;margin-top:12px;display:flex;justify-content:space-between;align-items:center">
+          <div id="status" class="muted small-muted">Idle</div>
+          <div id="trial-info" class="small-muted"></div>
+        </div>
+
+        <div id="controls-bottom" style="margin-top:14px;width:100%;display:flex;gap:8px;align-items:center;justify-content:center">
+          <div id="action-buttons" style="display:flex;gap:8px"></div>
+        </div>
+
+        <div id="results-area" style="width:100%;margin-top:18px;display:none">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:800" id="results-title">Results</div>
+              <div class="small-muted" id="results-sub">Summary metrics</div>
+            </div>
+            <div class="export">
+              <button class="btn ghost" id="save-local">Save locally</button>
+              <button class="btn ghost" id="download-csv">Download CSV</button>
+              <button class="btn" id="run-again">Run Again</button>
+            </div>
+          </div>
+
+          <div class="results" id="metrics-grid" style="margin-top:10px"></div>
+
+          <div style="margin-top:12px">
+            <div class="small-muted">RT distribution</div>
+            <div class="hist"><canvas id="hist-canvas" width="800" height="200" style="width:100%;height:120px"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <footer aria-hidden="true">Built for clarity • High-precision timing using performance.now()</footer>
+    </section>
+  </main>
+</div>
+
+<script>
+/* ===============================
+   Utilities & core timing engine
+   =============================== */
+const $ = sel => document.querySelector(sel);
+const stage = $('#stage');
+const statusEl = $('#status');
+const trialInfo = $('#trial-info');
+const resultsArea = $('#results-area');
+const metricsGrid = $('#metrics-grid');
+const progressBar = $('#progress-bar');
+const histCanvas = $('#hist-canvas');
+const controls = $('#action-buttons');
+
+let config = {
+  trials: parseInt($('#trialCount').value) || 12,
+  practiceTrials: 3
+};
+
+$('#trialCount').addEventListener('change', (e)=> {
+  let v = parseInt(e.target.value);
+  if(isNaN(v) || v < 4) v = 4;
+  config.trials = Math.min(50, Math.max(4, v));
+  e.target.value = config.trials;
+});
+
+$('#practice-btn').addEventListener('click', ()=> {
+  config.practiceTrials = 3;
+  alert('Practice mode will run 3 practice trials before the main test.');
+});
+$('#start-btn').addEventListener('click', ()=> startSelected());
+$('#btn-simple').addEventListener('click', ()=> select('simple'));
+$('#btn-choice').addEventListener('click', ()=> select('choice'));
+$('#btn-stroop').addEventListener('click', ()=> select('stroop'));
+$('#btn-flanker').addEventListener('click', ()=> select('flanker'));
+$('#btn-search').addEventListener('click', ()=> select('search'));
+$('#btn-battery').addEventListener('click', ()=> select('battery'));
+$('#run-again').addEventListener('click', ()=> startSelected(true));
+$('#download-csv').addEventListener('click', ()=> downloadCSV(currentResults));
+$('#save-local').addEventListener('click', ()=> saveLocal(currentResults));
+$('#export-all-btn').addEventListener('click', ()=> {
+  const all = JSON.parse(localStorage.getItem('psb_all')||'[]');
+  downloadCSV({all:true, allData:all});
+});
+
+let selected = null;
+function select(key){
+  selected = key;
+  statusEl.textContent = `Selected: ${humanName(key)}`;
+  document.querySelectorAll('.test-btn').forEach(b=>b.style.boxShadow='none');
+  const btn = {simple:'#btn-simple',choice:'#btn-choice',stroop:'#btn-stroop',flanker:'#btn-flanker',search:'#btn-search',battery:'#btn-battery'}[key];
+  if(btn) $(btn).style.boxShadow='0 10px 30px rgba(0,0,0,0.6)';
+}
+function humanName(k){
+  return ({simple:'Simple Reaction',choice:'Choice Reaction',stroop:'Stroop',flanker:'Flanker',search:'Visual Search',battery:'Full Battery'})[k]||k;
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a }
+
+/* Stats helpers */
+function mean(arr){return arr.reduce((s,x)=>s+x,0)/arr.length}
+function median(arr){
+  const s = [...arr].sort((a,b)=>a-b);
+  const mid = Math.floor(s.length/2);
+  return s.length%2?s[mid]:(s[mid-1]+s[mid])/2;
+}
+function sd(arr){
+  const m = mean(arr); return Math.sqrt(arr.reduce((s,x)=>s+(x-m)**2,0)/(arr.length-1||1));
+}
+function percentile(arr,p){
+  const s=[...arr].sort((a,b)=>a-b);
+  const idx = Math.max(0, Math.min(s.length-1, Math.round((p/100)*(s.length-1))));
+  return s[idx];
+}
+
+/* result storage */
+function saveLocal(results){
+  const stored = JSON.parse(localStorage.getItem('psb_all')||'[]');
+  stored.push({...results, timestamp: new Date().toISOString()});
+  localStorage.setItem('psb_all', JSON.stringify(stored));
+  alert('Saved locally in your browser storage.');
+}
+
+/* CSV export */
+function downloadCSV(results){
+  let rows=[];
+  if(results && results.all){
+    // all in local storage
+    const all = results.allData || [];
+    rows.push(['id','test','trial','rt_ms','correct','meta']);
+    all.forEach((sess,si)=> {
+      if(sess.data) sess.data.forEach((d,ti)=> rows.push([si,sess.test,ti+1,d.rt||'',d.correct,d.meta||'']));
+    });
+  } else if(results && results.data){
+    rows.push(['test','trial','rt_ms','correct','meta']);
+    results.data.forEach((d,i)=> rows.push([results.test, i+1, d.rt||'', d.correct, d.meta||'']));
+  } else {
+    alert('No results to export.');
+    return;
+  }
+  const csv = rows.map(r=>r.map(c=>`"${(''+(c||'')).replaceAll('"','""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `processing_speed_results_${new Date().toISOString().slice(0,19)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* histogram draw */
+function drawHist(rts){
+  const canvas = histCanvas;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!rts || rts.length===0) return;
+  const bins = 12;
+  const min = Math.min(...rts), max = Math.max(...rts);
+  const range = max-min || 1;
+  const counts = new Array(bins).fill(0);
+  rts.forEach(v=>{
+    const idx = Math.min(bins-1, Math.floor(((v-min)/range)*bins));
+    counts[idx]++;
+  });
+  const maxCount = Math.max(...counts);
+  // draw axes subtle
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  const pad = 10;
+  const w = (canvas.width-2*pad)/bins;
+  counts.forEach((c,i)=>{
+    const h = (c/maxCount) * (canvas.height-2*pad);
+    ctx.fillStyle = 'rgba(123,211,137,0.85)';
+    ctx.fillRect(pad + i*w + 4, canvas.height - pad - h, Math.max(6, w-8), h);
+  });
+  // labels
+  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.font = '12px system-ui, Arial';
+  ctx.fillText(`n=${rts.length} • min ${Math.round(min)} ms • max ${Math.round(max)} ms`, pad, 12);
+}
+
+/* ===============================
+   Test implementations
+   =============================== */
+
+const TestLibrary = {
+  /* Simple Reaction Time: wait random interval then show target, subject responds by click/space */
+  simple: function(trials=12, practice=0){
+    return new Promise(async (resolve)=>{
+      const results=[];
+      let current=0;
+      const runTrial = (isPractice=false)=> new Promise(rp=>{
+        stage.innerHTML = `<div style="text-align:center"><div style="font-weight:700">Get Ready...</div><div class="muted" style="margin-top:8px">Wait for the circle, then click anywhere or press <span class="kbd">Space</span>.</div></div>`;
+        statusEl.textContent = `Trial ${current+1}/${trials}${isPractice?' (practice)':''}`;
+        trialInfo.textContent = '';
+        progressBar.style.width = `${((current)/(trials))*100}%`;
+        // random delay
+        const delay = 600 + Math.random()*1600;
+        let shown=false, startTime=0, reacted=false;
+        let timeout = setTimeout(()=> {
+          shown=true;
+          startTime = performance.now();
+          stage.innerHTML = `<div class="circle" id="target" aria-hidden="true"></div>`;
+          statusEl.textContent = 'Stimulus ON - respond!';
+        }, delay);
+
+        function onResp(e){
+          if(reacted) return;
+          // accept click or space key
+          if(e.type==='keydown' && e.code!=='Space') return;
+          reacted=true;
+          const rt = shown ? performance.now()-startTime : performance.now() - (startTime || performance.now());
+          clearTimeout(timeout);
+          window.removeEventListener('keydown', onResp);
+          stage.removeEventListener('click', onResp);
+          rp({rt: Math.round(rt), correct: shown});
+        }
+        window.addEventListener('keydown', onResp);
+        stage.addEventListener('click', onResp);
+      });
+
+      // practice trials
+      for(let p=0;p<practice;p++){
+        current=p;
+        await runTrial(true);
+      }
+
+      // real trials
+      for(let t=0;t<trials;t++){
+        current = t;
+        trialInfo.textContent = `Trial ${t+1}/${trials}`;
+        const res = await runTrial(false);
+        results.push(res);
+        progressBar.style.width = `${((t+1)/trials)*100}%`;
+      }
+      resolve({test:'simple', data:results});
+    });
+  },
+
+  /* Choice Reaction: arrow left or right; require arrow key or clicking button */
+  choice: function(trials=12, practice=0){
+    return new Promise(async (resolve)=>{
+      const results=[];
+      let current=0;
+      const options = ['left','right'];
+      function showPrompt(dir){
+        stage.innerHTML = `<div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:12px">
+          <div style="font-size:48px">${dir==='left'?'←':'→'}</div>
+          <div class="muted">Press <span class="kbd">←</span> or <span class="kbd">→</span> (or click a button below)</div>
+          <div style="display:flex;gap:12px;margin-top:6px"><button id="leftBtn" class="btn ghost">Left ←</button><button id="rightBtn" class="btn ghost">Right →</button></div>
+          </div>`;
+      }
+      const runTrial = (isPractice=false)=> new Promise(rp=>{
+        const choice = options[Math.random()<0.5?0:1];
+        showPrompt(choice);
+        statusEl.textContent = `Trial ${current+1}/${trials}${isPractice?' (practice)':''}`;
+        const t0 = performance.now();
+        let responded=false;
+        function finish(correct){
+          if(responded) return;
+          responded=true;
+          const rt = Math.round(performance.now()-t0);
+          document.getElementById('leftBtn')?.removeEventListener('click', leftH);
+          document.getElementById('rightBtn')?.removeEventListener('click', rightH);
+          window.removeEventListener('keydown', keyH);
+          rp({rt, correct});
+        }
+        function leftH(){ finish(choice==='left') }
+        function rightH(){ finish(choice==='right') }
+        function keyH(e){
+          if(e.key === 'ArrowLeft') leftH();
+          if(e.key === 'ArrowRight') rightH();
+        }
+        document.getElementById('leftBtn')?.addEventListener('click', leftH);
+        document.getElementById('rightBtn')?.addEventListener('click', rightH);
+        window.addEventListener('keydown', keyH);
+      });
+
+      for(let p=0;p<practice;p++){ current=p; await runTrial(true); }
+      for(let t=0;t<trials;t++){
+        current=t; trialInfo.textContent = `Trial ${t+1}/${trials}`;
+        const res = await runTrial(false);
+        results.push(res);
+        progressBar.style.width = `${((t+1)/trials)*100}%`;
+      }
+      resolve({test:'choice', data:results});
+    });
+  },
+
+  /* Stroop: show color word printed in some color. Respond with ink color (keys r,g,b,y or colored buttons). */
+  stroop: function(trials=12, practice=0){
+    return new Promise(async (resolve)=>{
+      const colors = [
+        {name:'red', key:'r', code:'#ff4d4d'},
+        {name:'green', key:'g', code:'#57d27a'},
+        {name:'blue', key:'b', code:'#62c6ff'},
+        {name:'yellow', key:'y', code:'#ffd86b'}
+      ];
+      let results=[]; let current=0;
+      function show(word, ink){
+        stage.innerHTML = `<div style="text-align:center"><div style="font-size:44px;font-weight:800;color:${ink.code}">${word.toUpperCase()}</div>
+          <div class="muted" style="margin-top:8px">Press key <span class="kbd">${ink.key.toUpperCase()}</span> or click a color below to indicate the <strong>ink color</strong>.</div>
+          <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+            ${colors.map(c=>`<button class="btn color-btn ghost" data-color="${c.name}" style="border-left:6px solid ${c.code};min-width:80px">${c.name}</button>`).join('')}
+          </div></div>`;
+      }
+      const runTrial = (isPractice=false)=> new Promise(rp=>{
+        // random congruency: 50% congruent
+        const congruent = Math.random() < 0.5;
+        const wordObj = colors[Math.floor(Math.random()*colors.length)];
+        const inkObj = congruent ? wordObj : colors.filter(c=>c.name!==wordObj.name)[Math.floor(Math.random()* (colors.length-1))];
+        show(wordObj.name, inkObj);
+        statusEl.textContent = `Trial ${current+1}/${trials}${isPractice?' (practice)':''}`;
+        const t0 = performance.now();
+        let responded=false;
+        function finish(correct, meta=''){
+          if(responded) return; responded=true;
+          const rt = Math.round(performance.now()-t0);
+          document.querySelectorAll('.color-btn').forEach(b=>b.removeEventListener('click', clickH));
+          window.removeEventListener('keydown', keyH);
+          rp({rt, correct, meta});
+        }
+        function clickH(e){
+          const chosen = e.currentTarget.dataset.color;
+          finish(chosen===inkObj.name, `choice:${chosen}`);
+        }
+        function keyH(e){
+          const k = e.key.toLowerCase();
+          const matched = colors.find(c=>c.key===k);
+          if(matched) finish(matched.name === inkObj.name, `key:${k}`);
+        }
+        document.querySelectorAll('.color-btn').forEach(b=>b.addEventListener('click', clickH));
+        window.addEventListener('keydown', keyH);
+      });
+
+      for(let p=0;p<practice;p++){ current=p; await runTrial(true); }
+      for(let t=0;t<trials;t++){
+        current=t; trialInfo.textContent = `Trial ${t+1}/${trials}`;
+        const res = await runTrial(false);
+        results.push(res);
+        progressBar.style.width = `${((t+1)/trials)*100}%`;
+      }
+      resolve({test:'stroop', data:results});
+    });
+  },
+
+  /* Flanker: < < < < < vs > > < > >. Respond to center arrow direction. */
+  flanker: function(trials=12, practice=0){
+    return new Promise(async (resolve)=>{
+      const results=[]; let current=0;
+      function genStim(){
+        const centerDir = Math.random()<0.5?'<':'>';
+        const congruent = Math.random()<0.5;
+        const flank = congruent ? centerDir : (centerDir === '<' ? '>' : '<');
+        // sample flanker pattern
+        return flank+flank+centerDir+flank+flank;
+      }
+      function show(stim){
+        stage.innerHTML = `<div style="text-align:center;font-size:44px;font-weight:800">${stim}</div>
+          <div class="muted" style="margin-top:8px">Press <span class="kbd">←</span> if center is &lt; or <span class="kbd">→</span> if center is &gt;.</div>`;
+      }
+      const runTrial = (isPractice=false)=> new Promise(rp=>{
+        const stim = genStim();
+        show(stim);
+        statusEl.textContent = `Trial ${current+1}/${trials}${isPractice?' (practice)':''}`;
+        const t0 = performance.now();
+        let responded=false;
+        function finish(ch){
+          if(responded) return; responded=true;
+          const rt = Math.round(performance.now()-t0);
+          window.removeEventListener('keydown', keyH);
+          rp({rt, correct: ch});
+        }
+        function keyH(e){
+          if(e.key === 'ArrowLeft') finish(stim[2] === '<');
+          if(e.key === 'ArrowRight') finish(stim[2] === '>');
+        }
+        window.addEventListener('keydown', keyH);
+      });
+      for(let p=0;p<practice;p++){ current=p; await runTrial(true); }
+      for(let t=0;t<trials;t++){
+        current=t; trialInfo.textContent = `Trial ${t+1}/${trials}`;
+        const res = await runTrial(false);
+        results.push(res);
+        progressBar.style.width = `${((t+1)/trials)*100}%`;
+      }
+      resolve({test:'flanker', data:results});
+    });
+  },
+
+  /* Visual search: click the unique target among distractors (target: red circle). */
+  search: function(trials=12, practice=0){
+    return new Promise(async (resolve)=>{
+      const results=[]; let current=0;
+      function renderGrid(targetIdx, size=30, items=36){
+        // make grid
+        const cols = Math.ceil(Math.sqrt(items));
+        const html = ['<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px;width:100%;max-width:520px">'];
+        for(let i=0;i<items;i++){
+          if(i===targetIdx){
+            html.push(`<div class="item" data-target="1" style="height:${size}px;border-radius:50%;background:#ff4d4d;box-shadow:0 6px 18px rgba(0,0,0,0.4);cursor:pointer"></div>`);
+          } else {
+            // distractors: mix of shapes and colors
+            const color = Math.random()<0.5? '#9ad4ff' : '#bce7b0';
+            const shape = Math.random()<0.5? 'circle' : 'square';
+            const style = shape==='circle'?`border-radius:50%`:`border-radius:6px`;
+            html.push(`<div class="item" data-target="0" style="height:${size}px;${style};background:${color};cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.25)"></div>`);
+          }
+        }
+        html.push('</div>');
+        stage.innerHTML = `<div style="text-align:center"><div class="muted">Click the <strong>red circle</strong> as quickly as possible.</div><div style="margin-top:12px">${html.join('')}</div></div>`;
+      }
+
+      const runTrial = (isPractice=false)=> new Promise(rp=>{
+        const items = 36;
+        const targetIdx = Math.floor(Math.random()*items);
+        renderGrid(targetIdx, 28, items);
+        statusEl.textContent = `Trial ${current+1}/${trials}${isPractice?' (practice)':''}`;
+        const t0 = performance.now();
+        function clickH(e){
+          const tgt = e.target.closest('.item');
+          if(!tgt) return;
+          const correct = tgt.dataset.target === '1';
+          const rt = Math.round(performance.now()-t0);
+          stage.removeEventListener('click', clickH);
+          rp({rt, correct});
+        }
+        stage.addEventListener('click', clickH);
+      });
+
+      for(let p=0;p<practice;p++){ current=p; await runTrial(true); }
+      for(let t=0;t<trials;t++){
+        current=t; trialInfo.textContent = `Trial ${t+1}/${trials}`;
+        const res = await runTrial(false);
+        results.push(res);
+        progressBar.style.width = `${((t+1)/trials)*100}%`;
+      }
+      resolve({test:'search', data:results});
+    });
+  }
+};
+
+/* ===============
+   Runner: orchestrates single tests or full battery
+   =============== */
+
+let currentResults = null;
+
+async function runTestByName(name, trials, practice){
+  statusEl.textContent = `Running ${humanName(name)}...`;
+  if(!TestLibrary[name]) throw new Error('Unknown test '+name);
+  const res = await TestLibrary[name](trials, practice);
+  return res;
+}
+
+async function startSelected(force=false){
+  if(!selected) { alert('Please select a test first.'); return; }
+  config.trials = parseInt($('#trialCount').value) || config.trials;
+  resultsArea.style.display = 'none';
+  progressBar.style.width = '0%';
+  trialInfo.textContent = '';
+  controls.innerHTML = '';
+  try {
+    if(selected === 'battery'){
+      // run each test sequentially
+      const seq = ['simple','choice','stroop','flanker','search'];
+      const allRes=[];
+      for(const t of seq){
+        statusEl.textContent = `Preparing ${humanName(t)}...`;
+        await waitMs(400);
+        const r = await runTestByName(t, config.trials, config.practiceTrials);
+        allRes.push(r);
+        // small break screen
+        stage.innerHTML = `<div style="text-align:center"><div style="font-weight:800">${humanName(t)} complete</div><div class="muted" style="margin-top:6px">Take a short break — next test will start shortly.</div></div>`;
+        await waitMs(800);
+      }
+      // show combined summary: flatten RTs and compute metrics per test
+      currentResults = {test:'battery', data:allRes, summary: summarizeBattery(allRes)};
+      showBatterySummary(currentResults);
+      saveLocal(currentResults);
+    } else {
+      const res = await runTestByName(selected, config.trials, config.practiceTrials);
+      currentResults = summarizeResults(res);
+      showResults(currentResults);
+    }
+  } catch (err){
+    console.error(err);
+    alert('An error occurred: '+err.message);
+  }
+}
+
+/* small helper */
+function waitMs(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+/* Summarize a single test result object */
+function summarizeResults(res){
+  const rts = res.data.filter(d=>d.rt && d.correct!==false).map(d=>d.rt);
+  const wrong = res.data.filter(d=>d.correct===false).length;
+  const total = res.data.length;
+  const acc = Math.round(((total-wrong)/total)*100);
+  const m = rts.length?Math.round(mean(rts)):null;
+  const med = rts.length?Math.round(median(rts)):null;
+  const s = rts.length?Math.round(sd(rts)):null;
+  return {test:res.test, n:res.data.length, wrong, accuracy:acc, meanRT:m, medianRT:med, sdRT:s, data:res.data, rts};
+}
+
+/* For battery, compute per-test metrics */
+function summarizeBattery(allRes){
+  return allRes.map(r=>summarizeResults(r));
+}
+
+/* Present results UI for single test */
+function showResults(summary){
+  resultsArea.style.display = 'block';
+  $('#results-title').textContent = `${humanName(summary.test)} — Summary`;
+  $('#results-sub').textContent = `${summary.n} trials • Accuracy ${summary.accuracy}%`;
+  metricsGrid.innerHTML = `
+    <div class="metric"><div class="small-muted">Mean RT</div><div class="n">${summary.meanRT?summary.meanRT+' ms':'-'}</div></div>
+    <div class="metric"><div class="small-muted">Median RT</div><div class="n">${summary.medianRT?summary.medianRT+' ms':'-'}</div></div>
+    <div class="metric"><div class="small-muted">SD (ms)</div><div class="n">${summary.sdRT?summary.sdRT+' ms':'-'}</div></div>
+    <div class="metric"><div class="small-muted">Accuracy</div><div class="n">${summary.accuracy}%</div></div>
+    <div class="metric"><div class="small-muted">Errors</div><div class="n">${summary.wrong}</div></div>
+    <div class="metric"><div class="small-muted">Trials</div><div class="n">${summary.n}</div></div>
+  `;
+  drawHist(summary.rts);
+}
+
+/* Present battery summary */
+function showBatterySummary(battery){
+  resultsArea.style.display = 'block';
+  $('#results-title').textContent = 'Full Battery — Summary';
+  $('#results-sub').textContent = 'Per-test metrics';
+  metricsGrid.innerHTML = '';
+  battery.summary.forEach(s=>{
+    const div = document.createElement('div');
+    div.className = 'metric';
+    div.innerHTML = `<div class="small-muted">${humanName(s.test)}</div><div class="n">${s.meanRT? s.meanRT+' ms' : '-'}</div><div class="small-muted">acc ${s.accuracy}% • n ${s.n}</div>`;
+    metricsGrid.appendChild(div);
+  });
+  // for battery histogram, combine RTs
+  const allRts = battery.summary.flatMap(s=>s.rts);
+  drawHist(allRts);
+}
+
+/* store last results for export */
+function storeLastResults(res){
+  // leave for CSV export
+}
+
+/* utility to ensure keyboard events don't conflict while typing */
+window.addEventListener('keydown', (e)=> {
+  // Prevent page scroll when space pressed during tests
+  if(e.code==='Space') e.preventDefault();
+});
+
+/* Initialization */
+select('simple'); // default
+statusEl.textContent = 'Ready';
+
+/* small helpful note: expose a function for advanced use */
+window.psb = {runSelected:startSelected, runTestByName, summarizeResults};
+
+/* At end, make sure results object accessible */
+</script>
+</body>
+</html>
