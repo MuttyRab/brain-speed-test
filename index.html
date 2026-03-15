@@ -1,181 +1,635 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brain Speed Test</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Neural Speed Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
 
-body{
-font-family: Arial, sans-serif;
-background: linear-gradient(135deg,#0f1724,#081226);
-color:white;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-margin:0;
+:root {
+–bg-deep:    #050a12;
+–bg-card:    rgba(8, 18, 38, 0.85);
+–accent:     #00ffe0;
+–accent2:    #0066ff;
+–warn:       #ff3b6b;
+–text:       #c8dff0;
+–text-dim:   rgba(200,223,240,0.45);
+–glow:       0 0 24px rgba(0,255,224,0.25);
+–glow-strong:0 0 48px rgba(0,255,224,0.5);
 }
 
-.container{
-background:rgba(255,255,255,0.06);
-padding:40px;
-border-radius:15px;
-text-align:center;
-width:420px;
-box-shadow:0 20px 50px rgba(0,0,0,0.5);
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+height: 100%;
+background: var(–bg-deep);
+font-family: ‘Rajdhani’, sans-serif;
+color: var(–text);
+overflow: hidden;
 }
 
-h1{
-margin-top:0;
+/* ─── BACKGROUND GRID ─────────────────────────────────────── */
+.bg-grid {
+position: fixed; inset: 0; pointer-events: none; z-index: 0;
+background-image:
+linear-gradient(rgba(0,255,224,0.03) 1px, transparent 1px),
+linear-gradient(90deg, rgba(0,255,224,0.03) 1px, transparent 1px);
+background-size: 40px 40px;
+animation: gridDrift 30s linear infinite;
+}
+@keyframes gridDrift { to { background-position: 40px 40px; } }
+
+.bg-orb {
+position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+filter: blur(80px); opacity: 0.18;
+animation: orbFloat 8s ease-in-out infinite alternate;
+}
+.bg-orb-1 { width: 500px; height: 500px; top: -150px; right: -150px;
+background: radial-gradient(circle, #0066ff, transparent 70%); }
+.bg-orb-2 { width: 400px; height: 400px; bottom: -100px; left: -100px;
+background: radial-gradient(circle, #00ffe0, transparent 70%);
+animation-delay: -4s; }
+@keyframes orbFloat { from { transform: scale(1) translateY(0); }
+to { transform: scale(1.15) translateY(-30px); } }
+
+/* ─── LAYOUT ──────────────────────────────────────────────── */
+.shell {
+position: relative; z-index: 1;
+display: flex; align-items: center; justify-content: center;
+min-height: 100vh; padding: 20px;
 }
 
-button{
-padding:12px 20px;
-font-size:16px;
-border:none;
-border-radius:8px;
-background:#7bd389;
-cursor:pointer;
-font-weight:bold;
+.card {
+background: var(–bg-card);
+border: 1px solid rgba(0,255,224,0.12);
+border-radius: 20px;
+padding: clamp(28px, 5vw, 52px) clamp(24px, 5vw, 48px);
+width: min(480px, 100%);
+backdrop-filter: blur(20px);
+box-shadow: 0 32px 80px rgba(0,0,0,0.6), var(–glow);
+animation: cardIn 0.7s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn {
+from { opacity: 0; transform: translateY(32px) scale(0.96); }
+to   { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
-#stimulus{
-margin-top:25px;
-height:150px;
-display:flex;
-align-items:center;
-justify-content:center;
+/* ─── HEADER ──────────────────────────────────────────────── */
+.header { text-align: center; margin-bottom: 28px; }
+
+.header-tag {
+display: inline-block;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+color: var(–accent); opacity: 0.7; margin-bottom: 10px;
 }
 
-.circle{
-width:100px;
-height:100px;
-background:white;
-border-radius:50%;
-cursor:pointer;
+.title {
+font-size: clamp(28px, 6vw, 42px);
+font-weight: 700; line-height: 1.1;
+color: #fff;
+text-shadow: 0 0 30px rgba(0,255,224,0.3);
+}
+.title span { color: var(–accent); }
+
+.subtitle {
+margin-top: 10px; font-size: 15px; color: var(–text-dim);
+font-weight: 300; line-height: 1.5;
 }
 
-.result{
-margin-top:20px;
-font-size:18px;
+/* ─── PROGRESS BAR ────────────────────────────────────────── */
+.progress-wrap {
+margin-bottom: 24px;
+opacity: 0; transition: opacity 0.4s;
+}
+.progress-wrap.visible { opacity: 1; }
+
+.progress-label {
+display: flex; justify-content: space-between;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; color: var(–text-dim);
+margin-bottom: 8px;
+}
+.progress-label .highlight { color: var(–accent); }
+
+.progress-track {
+height: 3px; background: rgba(255,255,255,0.07);
+border-radius: 99px; overflow: hidden;
+}
+.progress-fill {
+height: 100%; width: 0%;
+background: linear-gradient(90deg, var(–accent2), var(–accent));
+border-radius: 99px;
+box-shadow: 0 0 10px var(–accent);
+transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─── STIMULUS ARENA ──────────────────────────────────────── */
+.arena {
+position: relative;
+height: clamp(160px, 30vw, 200px);
+display: flex; align-items: center; justify-content: center;
+margin: 0 0 24px;
+}
+
+/* Waiting state */
+.wait-ring {
+display: none; flex-direction: column; align-items: center; gap: 16px;
+}
+.wait-ring.active { display: flex; }
+
+.ring {
+width: 72px; height: 72px; border-radius: 50%;
+border: 2px solid rgba(0,255,224,0.15);
+border-top-color: var(–accent);
+animation: spin 1.2s linear infinite;
+position: relative;
+}
+.ring::after {
+content: ‘’;
+position: absolute; inset: 6px; border-radius: 50%;
+border: 2px solid rgba(0,255,224,0.08);
+border-bottom-color: var(–accent2);
+animation: spin 2s linear infinite reverse;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.wait-text {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 13px; color: var(–text-dim);
+letter-spacing: 2px; text-transform: uppercase;
+animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+/* Target circle */
+.target {
+display: none;
+width: clamp(90px, 20vw, 120px);
+height: clamp(90px, 20vw, 120px);
+border-radius: 50%;
+cursor: pointer;
+position: relative;
+transform: scale(0);
+transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.target.visible { transform: scale(1); }
+.target.pressed { transform: scale(0.88); transition-duration: 0.12s; }
+
+.target-inner {
+position: absolute; inset: 0; border-radius: 50%;
+background: radial-gradient(circle at 35% 35%, #e0fff9, #00ffe0 40%, #00b8a0);
+box-shadow: 0 0 0 0 rgba(0,255,224,0.6), var(–glow-strong);
+animation: pulse 1.8s ease-in-out infinite;
+}
+@keyframes pulse {
+0%,100% { box-shadow: 0 0 0  0px rgba(0,255,224,0.6), var(–glow-strong); }
+50%      { box-shadow: 0 0 0 20px rgba(0,255,224,0);   var(–glow-strong); }
+}
+
+.target-ring {
+position: absolute; inset: -12px; border-radius: 50%;
+border: 1.5px solid rgba(0,255,224,0.35);
+animation: ringExpand 1.8s ease-out infinite;
+}
+@keyframes ringExpand {
+0%   { inset: -8px;  opacity: 0.8; }
+100% { inset: -28px; opacity: 0; }
+}
+
+/* Too early flash */
+.early-flash {
+position: absolute; inset: 0;
+display: flex; align-items: center; justify-content: center;
+border-radius: 12px;
+color: var(–warn);
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 14px; letter-spacing: 2px;
+text-transform: uppercase;
+opacity: 0; pointer-events: none;
+transition: opacity 0.2s;
+}
+.early-flash.show { opacity: 1; }
+
+/* ─── REACTION TIME DISPLAY ───────────────────────────────── */
+.reaction-flash {
+position: absolute;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: clamp(22px, 5vw, 32px);
+color: var(–accent);
+pointer-events: none;
+opacity: 0;
+transform: translateY(0);
+text-shadow: var(–glow);
+}
+.reaction-flash.pop {
+animation: popUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards;
+}
+@keyframes popUp {
+0%   { opacity: 1;   transform: translateY(0); }
+60%  { opacity: 1;   transform: translateY(-20px); }
+100% { opacity: 0;   transform: translateY(-40px); }
+}
+
+/* ─── RESULT DOTS ─────────────────────────────────────────── */
+.dots-row {
+display: flex; gap: 8px; justify-content: center;
+margin-bottom: 24px; flex-wrap: wrap;
+}
+.dot {
+width: 28px; height: 28px; border-radius: 50%;
+border: 1.5px solid rgba(0,255,224,0.2);
+background: rgba(0,255,224,0.04);
+display: flex; align-items: center; justify-content: center;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 9px; color: var(–text-dim);
+transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+.dot.done {
+background: rgba(0,255,224,0.15);
+border-color: var(–accent);
+color: var(–accent);
+box-shadow: 0 0 10px rgba(0,255,224,0.3);
+transform: scale(1.15);
+}
+.dot.active {
+border-color: var(–accent2);
+box-shadow: 0 0 12px var(–accent2);
+animation: dotPulse 0.8s ease-in-out infinite alternate;
+}
+@keyframes dotPulse { to { transform: scale(1.2); } }
+
+/* ─── START BUTTON ────────────────────────────────────────── */
+.btn-start {
+width: 100%;
+padding: 15px 24px;
+background: transparent;
+border: 1.5px solid var(–accent);
+border-radius: 10px;
+color: var(–accent);
+font-family: ‘Rajdhani’, sans-serif;
+font-size: 17px; font-weight: 700;
+letter-spacing: 3px; text-transform: uppercase;
+cursor: pointer;
+position: relative; overflow: hidden;
+transition: color 0.3s, box-shadow 0.3s;
+}
+.btn-start::before {
+content: ‘’;
+position: absolute; inset: 0;
+background: var(–accent);
+transform: translateX(-105%);
+transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.btn-start:hover { color: var(–bg-deep); box-shadow: var(–glow-strong); }
+.btn-start:hover::before { transform: translateX(0); }
+.btn-start span { position: relative; z-index: 1; }
+.btn-start:active { transform: scale(0.97); }
+
+/* ─── RESULTS PANEL ───────────────────────────────────────── */
+.results-panel {
+display: none; flex-direction: column; gap: 16px;
+animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+.results-panel.show { display: flex; }
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(20px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.result-score {
+text-align: center;
+padding: 20px;
+border: 1px solid rgba(0,255,224,0.15);
+border-radius: 14px;
+background: rgba(0,255,224,0.04);
+}
+.result-score-label {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px; letter-spacing: 3px; color: var(–text-dim);
+text-transform: uppercase; margin-bottom: 6px;
+}
+.result-score-value {
+font-size: clamp(44px, 10vw, 64px); font-weight: 700;
+color: var(–accent); line-height: 1;
+text-shadow: 0 0 40px rgba(0,255,224,0.5);
+}
+.result-score-unit {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 14px; color: var(–text-dim); margin-top: 4px;
+}
+
+.result-bar-section { display: flex; flex-direction: column; gap: 8px; }
+.result-bar-label {
+display: flex; justify-content: space-between;
+font-size: 13px; color: var(–text-dim);
+font-family: ‘Share Tech Mono’, monospace;
+}
+.result-bar-label .val { color: var(–text); }
+.result-bar-track {
+height: 4px; background: rgba(255,255,255,0.07);
+border-radius: 99px; overflow: hidden;
+}
+.result-bar-fill {
+height: 100%; border-radius: 99px;
+transition: width 1s cubic-bezier(0.4,0,0.2,1) 0.3s;
+}
+
+.verdict {
+text-align: center;
+padding: 16px 20px;
+border-radius: 12px;
+font-size: 15px; line-height: 1.5;
+font-weight: 600;
+}
+.verdict.fast   { background: rgba(0,255,224,0.08); border: 1px solid rgba(0,255,224,0.2); color: var(–accent); }
+.verdict.avg    { background: rgba(0,102,255,0.08); border: 1px solid rgba(0,102,255,0.2); color: #5599ff; }
+.verdict.slow   { background: rgba(255,59,107,0.08); border: 1px solid rgba(255,59,107,0.2); color: var(–warn); }
+
+.breakdown-row {
+display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px;
+}
+.breakdown-cell {
+background: rgba(255,255,255,0.03);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 10px; padding: 10px 6px; text-align: center;
+}
+.breakdown-cell-n {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 10px; color: var(–text-dim); margin-bottom: 4px;
+}
+.breakdown-cell-v {
+font-size: 16px; font-weight: 600; color: var(–text);
+}
+
+/* ─── RESPONSIVE TWEAKS ───────────────────────────────────── */
+@media (max-width: 400px) {
+.card { padding: 24px 18px; }
+.arena { height: 150px; }
 }
 
 </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="bg-grid"></div>
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
 
-<h1>How Fast Is Your Brain?</h1>
+<div class="shell">
+<div class="card">
 
-<p>Click the circle as fast as you can when it appears.</p>
+  <div class="header">
+    <div class="header-tag">// neural benchmark</div>
+    <div class="title">Brain <span>Speed</span> Test</div>
+    <div class="subtitle">Tap the target the instant it appears. Five rounds.</div>
+  </div>
 
-<button onclick="startTest()">Start Test</button>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">
+      <span>Progress</span>
+      <span class="highlight" id="progressLabel">0 / 5</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
 
-<div id="stimulus"></div>
+  <div class="dots-row" id="dotsRow">
+    <div class="dot" id="dot-0">1</div>
+    <div class="dot" id="dot-1">2</div>
+    <div class="dot" id="dot-2">3</div>
+    <div class="dot" id="dot-3">4</div>
+    <div class="dot" id="dot-4">5</div>
+  </div>
 
-<div class="result" id="result"></div>
+  <div class="arena" id="arena">
 
+```
+<!-- Default idle state -->
+<div id="idleMsg" style="font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;opacity:0.6;">
+  Ready when you are
+</div>
+
+<!-- Waiting spinner -->
+<div class="wait-ring" id="waitRing">
+  <div class="ring"></div>
+  <div class="wait-text">Stand by…</div>
+</div>
+
+<!-- Target -->
+<div class="target" id="target" ontouchstart="recordReaction(event)" onclick="recordReaction(event)">
+  <div class="target-inner"></div>
+  <div class="target-ring"></div>
+</div>
+
+<!-- Too-early flash -->
+<div class="early-flash" id="earlyFlash">⚠ Too early!</div>
+
+<!-- Reaction pop number -->
+<div class="reaction-flash" id="reactionFlash"></div>
+```
+
+  </div>
+
+  <!-- Start button -->
+
+  <button class="btn-start" id="startBtn" onclick="startTest()">
+    <span>▶ Begin Test</span>
+  </button>
+
+  <!-- Results panel -->
+
+  <div class="results-panel" id="resultsPanel">
+    <div class="result-score">
+      <div class="result-score-label">Average Reaction Time</div>
+      <div class="result-score-value" id="scoreValue">—</div>
+      <div class="result-score-unit">milliseconds</div>
+    </div>
+
+```
+<div class="breakdown-row" id="breakdownRow"></div>
+
+<div class="result-bar-section">
+  <div class="result-bar-label">
+    <span>Speed Percentile</span>
+    <span class="val" id="percentileLabel">—</span>
+  </div>
+  <div class="result-bar-track">
+    <div class="result-bar-fill" id="percentileFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="verdict" id="verdict"></div>
+
+<button class="btn-start" onclick="startTest()">
+  <span>↺ Retry</span>
+</button>
+```
+
+  </div>
+
+</div>
 </div>
 
 <script>
+const TRIALS = 5;
+let startTime, timeout, waiting = false, canClick = false;
+let results = [], currentTrial = 0;
 
-let startTime
-let trials = 5
-let currentTrial = 0
-let results = []
+function $(id){ return document.getElementById(id); }
 
 function startTest(){
+  results = []; currentTrial = 0;
+  $('startBtn').style.display = 'none';
+  $('resultsPanel').classList.remove('show');
+  $('idleMsg').style.display = 'none';
+  $('progressWrap').classList.add('visible');
+  resetDots();
+  updateProgress(0);
+  nextTrial();
+}
 
-results = []
-currentTrial = 0
-document.getElementById("result").innerText=""
+function resetDots(){
+  for(let i=0;i<TRIALS;i++){
+    const d = $('dot-'+i);
+    d.className = 'dot';
+    d.textContent = i+1;
+  }
+}
 
-nextTrial()
-
+function updateProgress(n){
+  $('progressFill').style.width = (n/TRIALS*100)+'%';
+  $('progressLabel').textContent = n+' / '+TRIALS;
+  for(let i=0;i<n;i++) $('dot-'+i).className='dot done';
+  if(n < TRIALS) $('dot-'+n).className='dot active';
 }
 
 function nextTrial(){
+  hideTarget(); hideEarly();
+  showWait(true);
+  waiting = true; canClick = false;
 
-document.getElementById("stimulus").innerHTML="Wait..."
-
-let delay = 1000 + Math.random()*3000
-
-setTimeout(()=>{
-
-document.getElementById("stimulus").innerHTML=
-'<div class="circle" onclick="recordReaction()"></div>'
-
-startTime = performance.now()
-
-},delay)
-
+  const delay = 1200 + Math.random() * 3000;
+  timeout = setTimeout(showTarget, delay);
 }
 
-function recordReaction(){
-
-let reaction = performance.now() - startTime
-
-results.push(reaction)
-
-currentTrial++
-
-if(currentTrial < trials){
-
-nextTrial()
-
+function showTarget(){
+  waiting = false; canClick = true;
+  showWait(false);
+  const t = $('target');
+  t.style.display = 'block';
+  // Force reflow for animation
+  void t.offsetWidth;
+  t.classList.add('visible');
+  startTime = performance.now();
 }
 
-else{
-
-showResults()
-
+function hideTarget(){
+  const t = $('target');
+  t.classList.remove('visible','pressed');
+  t.style.display = 'none';
 }
 
+function showWait(on){
+  $('waitRing').classList.toggle('active', on);
+}
+
+function hideEarly(){
+  $('earlyFlash').classList.remove('show');
+}
+
+function recordReaction(e){
+  if(e) e.preventDefault();
+  if(waiting){
+    // Too early
+    clearTimeout(timeout);
+    waiting = false;
+    showWait(false);
+    $('earlyFlash').classList.add('show');
+    setTimeout(()=>{ hideEarly(); nextTrial(); }, 1200);
+    return;
+  }
+  if(!canClick) return;
+  canClick = false;
+
+  const rt = Math.round(performance.now() - startTime);
+  results.push(rt);
+
+  const t = $('target');
+  t.classList.add('pressed');
+
+  // Flash the reaction time
+  const rf = $('reactionFlash');
+  rf.textContent = rt + 'ms';
+  rf.classList.remove('pop');
+  void rf.offsetWidth;
+  rf.classList.add('pop');
+
+  setTimeout(()=>{
+    hideTarget();
+    currentTrial++;
+    updateProgress(currentTrial);
+
+    if(currentTrial < TRIALS){
+      setTimeout(nextTrial, 600);
+    } else {
+      setTimeout(showResults, 800);
+    }
+  }, 300);
 }
 
 function showResults(){
+  showWait(false);
+  $('progressWrap').classList.remove('visible');
 
-let avg = results.reduce((a,b)=>a+b)/results.length
+  const avg = Math.round(results.reduce((a,b)=>a+b)/results.length);
+  const min = Math.min(...results);
+  const max = Math.max(...results);
 
-avg = Math.round(avg)
+  $('scoreValue').textContent = avg;
 
-let message = evaluateScore(avg)
+  // Breakdown cells
+  const br = $('breakdownRow');
+  br.innerHTML = '';
+  results.forEach((r,i)=>{
+    br.innerHTML += `<div class="breakdown-cell">
+      <div class="breakdown-cell-n">Trial ${i+1}</div>
+      <div class="breakdown-cell-v">${r}<span style="font-size:10px;color:var(--text-dim)">ms</span></div>
+    </div>`;
+  });
 
-document.getElementById("stimulus").innerHTML=""
+  // Percentile: rough model  200=95th  400=5th
+  const pct = Math.max(5, Math.min(99, Math.round(100 - ((avg-150)/300)*90)));
+  const color = avg < 250 ? '#00ffe0' : avg < 350 ? '#5599ff' : '#ff3b6b';
+  $('percentileLabel').textContent = 'Top '+( 100-pct )+'%';
+  const pf = $('percentileFill');
+  pf.style.background = `linear-gradient(90deg, var(--accent2), ${color})`;
+  pf.style.boxShadow = `0 0 8px ${color}`;
+  setTimeout(()=>{ pf.style.width = pct+'%'; }, 50);
 
-document.getElementById("result").innerText =
-"Average Reaction Time: "+avg+" ms\n\n"+message
+  // Verdict
+  const v = $('verdict');
+  const { cls, msg } = evaluate(avg);
+  v.className = 'verdict ' + cls;
+  v.textContent = msg;
 
+  $('resultsPanel').classList.add('show');
 }
 
-function evaluateScore(ms){
-
-if(ms < 200){
-return "Extremely fast. Your reaction speed is faster than most people."
+function evaluate(ms){
+  if(ms < 200) return { cls:'fast', msg:'⚡ Extraordinary. Reaction speed in the top percentile of human performance.' };
+  if(ms < 250) return { cls:'fast', msg:'✦ Excellent reflexes. Significantly faster than average.' };
+  if(ms < 300) return { cls:'avg',  msg:'◈ Above average reaction speed. Solid neural processing.' };
+  if(ms < 350) return { cls:'avg',  msg:'◎ Average reaction speed. Right in the middle of the bell curve.' };
+  if(ms < 420) return { cls:'slow', msg:'▽ Slightly below average. Try again after a break.' };
+  return            { cls:'slow', msg:'△ Slower than average. Fatigue or distraction may be a factor.' };
 }
 
-else if(ms < 250){
-return "Above average reaction speed."
-}
-
-else if(ms < 300){
-return "Average reaction speed."
-}
-
-else if(ms < 350){
-return "Below average reaction speed."
-}
-
-else{
-return "Slower than average reaction speed."
-}
-
-}
-
+// Prevent double-fire on touch devices
+document.getElementById('target').addEventListener('touchstart', recordReaction, { passive: false });
 </script>
 
 </body>
