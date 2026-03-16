@@ -1,15 +1,31 @@
 <!DOCTYPE html>
 
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="color-scheme" content="dark light">
 <title>Brain Speed Test</title>
+<!-- Immediately apply dark theme before any paint — prevents flash of wrong theme -->
+<script>
+(function(){
+  try {
+    var saved = localStorage.getItem('bst-theme');
+    // Default is always dark unless user has explicitly chosen light
+    document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+  } catch(e) {
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+})();
+</script>
+<!-- Google Fonts — optional enhancement; system fonts used as fallback -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 
-/* ── TOKENS ── */
-[data-theme=“dark”] {
+/* ── TOKENS: dark is the ROOT default; light is an override ── */
+:root {
 –bg:    #0a0a0a;  –card:  #141414;  –surf:  #1e1e1e;
 –lift:  #272727;  –line:  #363636;
 –t1: #F0F0F0;  –t2: #B8B8B8;  –t3: #787878;
@@ -19,6 +35,7 @@
 –blue: #3B82F6;  –gold: #F59E0B;
 –shade: 0 20px 60px rgba(0,0,0,.85);
 }
+/* Light mode override — applied by JS toggle or system pref */
 [data-theme=“light”] {
 –bg:    #F0EBE0;  –card:  #FFFFFF;  –surf:  #EAE4DA;
 –lift:  #DDD8CC;  –line:  #C8C0B0;
@@ -33,10 +50,12 @@
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html{height:100%;-webkit-font-smoothing:antialiased;}
-body{min-height:100%;background:var(–bg);font-family:‘Syne’,sans-serif;color:var(–t2);overflow-x:hidden;transition:background .3s;}
-[data-theme=“dark”] body::before{content:’’;position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+:root{–mono:‘JetBrains Mono’,‘Courier New’,Courier,monospace;}
+body{min-height:100%;background:var(–bg);font-family:‘Syne’,-apple-system,BlinkMacSystemFont,‘Segoe UI’,system-ui,sans-serif;color:var(–t2);overflow-x:hidden;transition:background .3s;}
+body::before{content:’’;position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
 background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘200’ height=‘200’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=’.75’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘200’ height=‘200’ filter=‘url(%23n)’/%3E%3C/svg%3E”);
 background-size:200px;}
+[data-theme=“light”] body::before{display:none;}
 
 /* ── LAYOUT ── */
 .shell{position:relative;z-index:1;display:flex;justify-content:center;min-height:100vh;padding:20px 12px 52px;}
@@ -45,7 +64,8 @@ background-size:200px;}
 .thm{position:fixed;top:14px;right:14px;z-index:300;width:40px;height:40px;border-radius:6px;background:var(–surf);border:1px solid var(–line);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .15s;}
 .thm:hover{border-color:var(–fire);transform:scale(1.08);}
 .thm:active{transform:scale(.93);}
-[data-theme=“dark”] .i-sun{display:block;}[data-theme=“dark”] .i-moon{display:none;}
+/* Dark (default): show sun icon to switch TO light */
+.i-sun{display:block;}.i-moon{display:none;}
 [data-theme=“light”] .i-sun{display:none;}[data-theme=“light”] .i-moon{display:block;}
 
 /* ── CARD ── */
@@ -490,7 +510,12 @@ cursor:pointer;user-select:none;transition:transform .1s;
 </div></div>
 <script>
 /* ── THEME ── */
-function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');}
+function toggleTheme(){
+  var h=document.documentElement;
+  var next=h.getAttribute('data-theme')==='dark'?'light':'dark';
+  h.setAttribute('data-theme',next);
+  try{localStorage.setItem('bst-theme',next);}catch(e){}
+}
 
 /* ── STATE ── */
 const scores={
@@ -927,6 +952,26 @@ showScreen(‘screen-intro’);
 [‘srt-target’,‘gng-target’].forEach(id=>{
 const el=document.getElementById(id);
 if(el)el.addEventListener(‘touchstart’,e=>e.preventDefault(),{passive:false});
+});
+
+// Failsafe event listeners — in case onclick attributes are stripped by any environment
+document.addEventListener(‘DOMContentLoaded’,function(){
+var map={
+‘screen-intro .btn’:‘startBattery’,
+‘srt-ready .ready-btn’:‘beginSRT’,
+‘crt-ready .ready-btn’:‘beginCRT’,
+‘stroop-ready .ready-btn’:‘beginStroop’,
+‘mem-ready .ready-btn’:‘beginMemory’,
+‘gng-ready .ready-btn’:‘beginGNG’,
+‘screen-results .btn-ghost’:‘restartAll’
+};
+Object.keys(map).forEach(function(sel){
+var el=document.querySelector(’#’+sel);
+if(el){
+var fn=map[sel];
+el.addEventListener(‘click’,function(e){window[fn]&&window[fn](e);});
+}
+});
 });
 </script>
 
