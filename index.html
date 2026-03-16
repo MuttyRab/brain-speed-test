@@ -37,8 +37,10 @@
 html{height:100%;-webkit-font-smoothing:antialiased;}
 :root{–mono:‘JetBrains Mono’,‘Courier New’,Courier,monospace;}
 body{min-height:100%;background:var(–bg);font-family:‘Syne’,-apple-system,BlinkMacSystemFont,‘Segoe UI’,system-ui,sans-serif;color:var(–t2);overflow-x:hidden;transition:background .3s;}
-/* decorative grain removed */
-[data-theme=“light”] /* decorative grain removed */
+body::before{content:’’;position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘200’ height=‘200’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=’.75’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘200’ height=‘200’ filter=‘url(%23n)’/%3E%3C/svg%3E”);
+background-size:200px;}
+[data-theme=“light”] body::before{display:none;}
 
 /* ── LAYOUT ── */
 .shell{position:relative;z-index:1;display:flex;justify-content:center;min-height:100vh;padding:20px 12px 52px;}
@@ -284,7 +286,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
 
 </head>
 <body>
-<button class="thm" onclick="toggleTheme()"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
+<button class="thm" id="btn-theme"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
 <div class="shell"><div class="card">
 
 <!-- ════ INTRO ════ -->
@@ -302,7 +304,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="t-row"><span class="t-n">05</span><span class="t-ic">🛑</span><div class="t-inf"><div class="t-name">Self-Control</div><div class="t-desc">Tap green. Don't tap red. Sounds easy…</div></div><span class="t-dur">15 trials</span></div>
   </div>
   <div class="sci-note"><strong>Backed by research.</strong> Benchmarks from MindCrowd (159,000+ people), Stroop interference norms, Corsi memory span data, and the Go/No-Go inhibition paradigm.</div>
-  <button class="btn" onclick="startBattery()">▶ &nbsp;Start the Test</button>
+  <button class="btn" id="btn-start">▶ &nbsp;Start the Test</button>
 </div>
 
 <!-- ════ TEST 1 — SRT ════ -->
@@ -320,7 +322,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="ready-icon">⚡</div>
     <div class="ready-title">Raw Reaction Speed</div>
     <div class="ready-sub">A circle will appear after a random delay. Tap it the instant you see it. Don't tap early!</div>
-    <button class="ready-btn" onclick="beginSRT()">▶ &nbsp;Start Test 1</button>
+    <button class="ready-btn" id="btn-begin-srt">▶ &nbsp;Start Test 1</button>
   </div>
 
   <!-- Test area shown after Start is pressed -->
@@ -331,7 +333,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="arena arena-fixed">
       <div class="arena-msg" id="srt-idle">Get ready…</div>
       <div class="spin-wrap" id="srt-spin"><div class="spin"></div><div class="spin-lbl">STAND BY</div></div>
-      <div class="srt-circ" id="srt-target" ontouchstart="srtClick(event)" onclick="srtClick(event)">
+      <div class="srt-circ" id="srt-target">
         <div class="srt-fill"></div><div class="srt-ring"></div>
       </div>
       <div class="ovl" id="srt-early">⚠ Too early!</div>
@@ -353,7 +355,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="ready-icon">🎯</div>
     <div class="ready-title">Decision Speed</div>
     <div class="ready-sub">Four shapes appear. One will light up brightly — tap it as fast as you can. Ignore the others.</div>
-    <button class="ready-btn" onclick="beginCRT()">▶ &nbsp;Start Test 2</button>
+    <button class="ready-btn" id="btn-begin-crt">▶ &nbsp;Start Test 2</button>
   </div>
 
   <div id="crt-run" style="display:none;">
@@ -364,10 +366,10 @@ cursor:pointer;user-select:none;transition:transform .1s;
         <div class="crt-msg" id="crt-msg">Get ready…</div>
         <div class="spin-wrap" id="crt-spin"><div class="spin"></div><div class="spin-lbl">STAND BY</div></div>
         <div class="crt-grid" id="crt-btns" style="display:none;">
-          <div class="cbt" id="cbt-0" ontouchstart="crtClick(0,event)" onclick="crtClick(0,event)">■</div>
-          <div class="cbt" id="cbt-1" ontouchstart="crtClick(1,event)" onclick="crtClick(1,event)">●</div>
-          <div class="cbt" id="cbt-2" ontouchstart="crtClick(2,event)" onclick="crtClick(2,event)">▲</div>
-          <div class="cbt" id="cbt-3" ontouchstart="crtClick(3,event)" onclick="crtClick(3,event)">★</div>
+          <div class="cbt" id="cbt-0">■</div>
+          <div class="cbt" id="cbt-1">●</div>
+          <div class="cbt" id="cbt-2">▲</div>
+          <div class="cbt" id="cbt-3">★</div>
         </div>
         <div class="rtpop" id="crt-rtpop" style="position:relative;opacity:0;"></div>
       </div>
@@ -388,7 +390,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="ready-icon">🎨</div>
     <div class="ready-title">Colour Focus</div>
     <div class="ready-sub">A coloured word appears. Tap the button matching the <strong style="color:var(--fire)">ink colour</strong> — not what the word says.</div>
-    <button class="ready-btn" onclick="beginStroop()">▶ &nbsp;Start Test 3</button>
+    <button class="ready-btn" id="btn-begin-stroop">▶ &nbsp;Start Test 3</button>
   </div>
 
   <div id="stroop-run" style="display:none;">
@@ -400,10 +402,10 @@ cursor:pointer;user-select:none;transition:transform .1s;
         <div class="stroop-run">
           <div class="stroop-word" id="stroop-word">RED</div>
           <div class="stroop-btns">
-            <button class="s-btn" data-color="RED"    ontouchstart="stroopClick('RED',event)"    onclick="stroopClick('RED',event)">RED</button>
-            <button class="s-btn" data-color="BLUE"   ontouchstart="stroopClick('BLUE',event)"   onclick="stroopClick('BLUE',event)">BLUE</button>
-            <button class="s-btn" data-color="GREEN"  ontouchstart="stroopClick('GREEN',event)"  onclick="stroopClick('GREEN',event)">GREEN</button>
-            <button class="s-btn" data-color="YELLOW" ontouchstart="stroopClick('YELLOW',event)" onclick="stroopClick('YELLOW',event)">YELLOW</button>
+            <button class="s-btn" data-color="RED">RED</button>
+            <button class="s-btn" data-color="BLUE">BLUE</button>
+            <button class="s-btn" data-color="GREEN">GREEN</button>
+            <button class="s-btn" data-color="YELLOW">YELLOW</button>
           </div>
           <div class="stroop-fb" id="stroop-fb"></div>
         </div>
@@ -425,7 +427,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="ready-icon">🧩</div>
     <div class="ready-title">Short-Term Memory</div>
     <div class="ready-sub">Squares light up in a sequence. Watch carefully, then tap them back in the same order.</div>
-    <button class="ready-btn" onclick="beginMemory()">▶ &nbsp;Start Test 4</button>
+    <button class="ready-btn" id="btn-begin-mem">▶ &nbsp;Start Test 4</button>
   </div>
 
   <div id="mem-run" style="display:none;">
@@ -454,7 +456,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="ready-icon">🛑</div>
     <div class="ready-title">Self-Control</div>
     <div class="ready-sub"><span style="color:var(--go);font-weight:700;">GREEN circle = tap it fast</span><br><br><span style="color:var(--stop);font-weight:700;">RED circle = do NOT tap it</span></div>
-    <button class="ready-btn" onclick="beginGNG()">▶ &nbsp;Start Test 5</button>
+    <button class="ready-btn" id="btn-begin-gng">▶ &nbsp;Start Test 5</button>
   </div>
 
   <div id="gng-run" style="display:none;">
@@ -463,7 +465,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
     <div class="arena arena-fixed">
       <div class="arena-msg" id="gng-idle">Starting…</div>
       <div class="spin-wrap" id="gng-spin"><div class="spin"></div><div class="spin-lbl">STAND BY</div></div>
-      <div class="gng-tgt" id="gng-target" ontouchstart="gngClick(event)" onclick="gngClick(event)">
+      <div class="gng-tgt" id="gng-target">
         <div id="gng-fill" style="position:absolute;inset:0;border-radius:50%;"></div>
         <div class="gng-lbl" id="gng-label"></div>
       </div>
@@ -486,7 +488,7 @@ cursor:pointer;user-select:none;transition:transform .1s;
   <div class="pg-title" style="margin-bottom:18px;">Your Results</div>
   <div class="results-wrap" id="results-wrap"></div>
   <div class="btn-row" style="margin-top:20px;">
-    <button class="btn-ghost" onclick="restartAll()">↺ &nbsp;Take it Again</button>
+    <button class="btn-ghost" id="btn-restart">↺ &nbsp;Take it Again</button>
   </div>
 </div>
 
@@ -932,24 +934,41 @@ scores.gng={goTimes:[],hits:0,misses:0,falseAlarms:0,correctInhibits:0,goTrials:
 showScreen(‘screen-intro’);
 }
 
+// ── Wire all buttons via addEventListener (works on all hosting environments) ──
+document.getElementById(‘btn-theme’).addEventListener(‘click’, function() {
+var h = document.documentElement;
+var next = h.getAttribute(‘data-theme’) === ‘dark’ ? ‘light’ : ‘dark’;
+h.setAttribute(‘data-theme’, next);
+try { localStorage.setItem(‘bst-theme’, next); } catch(e) {}
+});
+
+document.getElementById(‘btn-start’).addEventListener(‘click’, startBattery);
+document.getElementById(‘btn-begin-srt’).addEventListener(‘click’, beginSRT);
+document.getElementById(‘btn-begin-crt’).addEventListener(‘click’, beginCRT);
+document.getElementById(‘btn-begin-stroop’).addEventListener(‘click’, beginStroop);
+document.getElementById(‘btn-begin-mem’).addEventListener(‘click’, beginMemory);
+document.getElementById(‘btn-begin-gng’).addEventListener(‘click’, beginGNG);
+document.getElementById(‘btn-restart’).addEventListener(‘click’, restartAll);
+
+[0,1,2,3].forEach(function(i) {
+var btn = document.getElementById(‘cbt-’ + i);
+btn.addEventListener(‘click’, function(e) { crtClick(i, e); });
+btn.addEventListener(‘touchstart’, function(e) { e.preventDefault(); crtClick(i, e); }, {passive:false});
+});
+
+document.querySelectorAll(’.s-btn’).forEach(function(btn) {
+var color = btn.getAttribute(‘data-color’);
+btn.addEventListener(‘click’, function() { stroopClick(color, null); });
+btn.addEventListener(‘touchstart’, function(e) { e.preventDefault(); stroopClick(color, e); }, {passive:false});
+});
+
+// Restore saved theme
+try { if (localStorage.getItem(‘bst-theme’) === ‘light’) document.documentElement.setAttribute(‘data-theme’, ‘light’); } catch(e) {}
+
 [‘srt-target’,‘gng-target’].forEach(id=>{
 const el=document.getElementById(id);
 if(el)el.addEventListener(‘touchstart’,e=>e.preventDefault(),{passive:false});
 });
-
-```
-}
-```
-
-});
-});
-
-// Restore saved theme preference on page load
-try {
-if (localStorage.getItem(‘bst-theme’) === ‘light’) {
-document.documentElement.setAttribute(‘data-theme’, ‘light’);
-}
-} catch(e) {}
 </script>
 
 </body>
