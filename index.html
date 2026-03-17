@@ -8,177 +8,192 @@
 <style>
 
 /* ============================================================
-TOKENS — dark on :root (default), light overrides on html
+THE CORRECT WAY: html[data-theme=“X”] targets the html
+element itself. [data-theme=“X”] html would try to find
+an html INSIDE [data-theme] which never exists.
 ============================================================ */
+
+/* Dark mode = default. Hardcoded values on :root AND on html[data-theme=“dark”] */
 :root {
-–bg:#0a0a0a; –card:#141414; –surf:#1e1e1e;
-–lift:#272727; –line:#363636;
-–t1:#FFFFFF; –t2:#D0D0D0; –t3:#A0A0A0;
 –fire:#FF4F1F; –fire-lo:rgba(255,79,31,.13);
 –go:#22C55E;   –go-lo:rgba(34,197,94,.12);
 –stop:#EF4444; –stop-lo:rgba(239,68,68,.12);
 –blue:#3B82F6; –gold:#F59E0B;
-–sh:0 20px 60px rgba(0,0,0,.85);
 }
-/* Light mode — redefines all vars. Everything using var() updates automatically. */
-[data-theme=“light”] {
-–bg:#F0EBE0 !important; –card:#FFFFFF !important; –surf:#EAE4DA !important;
-–lift:#DDD8CC !important; –line:#C8C0B0 !important;
-–t1:#111111 !important; –t2:#444444 !important; –t3:#777777 !important;
-–fire:#C83000 !important; –fire-lo:rgba(200,48,0,.1) !important;
-–go:#166534 !important;   –go-lo:rgba(22,101,52,.1) !important;
-–stop:#B91C1C !important; –stop-lo:rgba(185,28,28,.1) !important;
-–blue:#1D4ED8 !important; –gold:#92400E !important;
-–sh:0 8px 32px rgba(0,0,0,.1) !important;
-}
-/* ── Light mode explicit color rules (no vars — 100% reliable on all iOS) ── */
-[data-theme=“light”] .display{color:#111111 !important;}
-[data-theme=“light”] .display b{color:#C83000 !important;}
-[data-theme=“light”] .pg-title{color:#111111 !important;}
-[data-theme=“light”] .pg-sub{color:#444444 !important;}
-[data-theme=“light”] .t-name{color:#111111 !important;}
-[data-theme=“light”] .t-desc{color:#444444 !important;}
-[data-theme=“light”] .t-n{color:#444444 !important;}
-[data-theme=“light”] .t-dur{color:#444444 !important;}
-[data-theme=“light”] .t-title{color:#111111 !important;}
-[data-theme=“light”] .ready-h{color:#111111 !important;}
-[data-theme=“light”] .ready-p{color:#444444 !important;}
-[data-theme=“light”] .kicker{color:#C83000 !important;}
-[data-theme=“light”] .instr{background:#EAE4DA !important;color:#111111 !important;border-left-color:#C83000 !important;}
-[data-theme=“light”] .hl{color:#C83000 !important;}
-[data-theme=“light”] .card{background:#FFFFFF !important;border-color:#C8C0B0 !important;border-left-color:#C83000 !important;}
-[data-theme=“light”] .arena{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-[data-theme=“light”] .ready{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-[data-theme=“light”] .btn{background:#C83000 !important;}
-[data-theme=“light”] .btn-ghost{border-color:#C83000 !important;color:#C83000 !important;}
-[data-theme=“light”] .prog-rail{background:#EAE4DA !important;}
-[data-theme=“light”] .prog-pct{color:#C83000 !important;}
-[data-theme=“light”] .dot{background:#EAE4DA !important;border-color:#C8C0B0 !important;color:#777777 !important;}
-[data-theme=“light”] .dot.done{background:rgba(200,48,0,.1) !important;border-color:#C83000 !important;color:#C83000 !important;}
-[data-theme=“light”] .dot.active{border-color:#C83000 !important;color:#C83000 !important;}
-[data-theme=“light”] .t-step{color:#C83000 !important;}
-[data-theme=“light”] .a-msg{color:#444444 !important;}
-[data-theme=“light”] .sp{border-top-color:#C83000 !important;}
-[data-theme=“light”] .sp-lbl{color:#444444 !important;}
-[data-theme=“light”] .sci{background:rgba(200,48,0,.1) !important;border-left-color:#C83000 !important;}
-[data-theme=“light”] .sci strong{color:#C83000 !important;}
-[data-theme=“light”] .rule{background:#C8C0B0 !important;}
-[data-theme=“light”] .thm{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-[data-theme=“light”] .crt-msg{color:#444444 !important;}
-[data-theme=“light”] .mi{color:#444444 !important;}
-[data-theme=“light”] .mc{background:#DDD8CC !important;border-color:#C8C0B0 !important;}
-[data-theme=“light”] .mbar{background:#EAE4DA !important;}
-[data-theme=“light”] .mbl{color:#444444 !important;}
-[data-theme=“light”] .mbv{color:#111111 !important;}
-[data-theme=“light”] .gsl{color:#444444 !important;}
-[data-theme=“light”] .gsv{color:#111111 !important;}
-[data-theme=“light”] .gs{background:#EAE4DA !important;}
-[data-theme=“light”] .sc-tag{color:#444444 !important;}
-[data-theme=“light”] .sc-big{color:#C83000 !important;}
-[data-theme=“light”] .sc-of{color:#444444 !important;}
-[data-theme=“light”] .vp{background:#EAE4DA !important;}
-[data-theme=“light”] .vt{color:#111111 !important;}
-[data-theme=“light”] .vb{color:#444444 !important;}
-[data-theme=“light”] .sec{color:#444444 !important;}
-[data-theme=“light”] .sec::after{background:#C8C0B0 !important;}
-[data-theme=“light”] .rc{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-[data-theme=“light”] .rc-name{color:#111111 !important;}
-[data-theme=“light”] .rc-sl{color:#444444 !important;}
-[data-theme=“light”] .rc-sv{color:#111111 !important;}
-[data-theme=“light”] .rc-desc{color:#444444 !important;}
-[data-theme=“light”] .rc-stat{background:#DDD8CC !important;}
-[data-theme=“light”] .rc-bar{background:#DDD8CC !important;}
-[data-theme=“light”] .sc-panel{background:#EAE4DA !important;border-left-color:#C83000 !important;}
-[data-theme=“light”] .src-btn{background:#EAE4DA !important;color:#444444 !important;}
-[data-theme=“light”] .src-btn:hover{color:#C83000 !important;}
-[data-theme=“light”] .src-body{background:#FFFFFF !important;}
-[data-theme=“light”] .src-body li{color:#444444 !important;border-bottom-color:#C8C0B0 !important;}
-[data-theme=“light”] .src-body b{color:#111111 !important;}
-[data-theme=“light”] .src-wrap{border-color:#C8C0B0 !important;}
-[data-theme=“light”] .src-body li::before{color:#C83000 !important;}
-[data-theme=“light”] .rnd{color:#777777 !important;}
-[data-theme=“light”] .hg{color:#166534 !important;}
-[data-theme=“light”] .hr{color:#B91C1C !important;}
-[data-theme=“light”] .stroop-fb{color:#444444 !important;}
-[data-theme=“light”] .srt-f{background:radial-gradient(circle at 38% 32%,#fff,#C83000 40%,#5a0e00) !important;}
-[data-theme=“light”] .ovl{background:rgba(185,28,28,.1) !important;color:#B91C1C !important;}
 
-/* ── html and body: hardcoded per theme, no vars ── */
-[data-theme=“dark”] html,[data-theme=“dark”] body{background:#0a0a0a !important;color:#D0D0D0 !important;}
-[data-theme=“light”] html,[data-theme=“light”] body{background:#F0EBE0 !important;color:#444444 !important;}
+/* ── DARK (default) ── */
+html { background:#0a0a0a; }
+body { background:#0a0a0a; color:#D0D0D0; }
+html[data-theme=“dark”] { background:#0a0a0a; }
+html[data-theme=“dark”] body { background:#0a0a0a !important; color:#D0D0D0 !important; }
+html[data-theme=“dark”] .card  { background:#141414 !important; border-color:#363636 !important; border-left-color:#FF4F1F !important; }
+html[data-theme=“dark”] .display { color:#FFFFFF !important; }
+html[data-theme=“dark”] .display b { color:#FF4F1F !important; }
+html[data-theme=“dark”] .kicker  { color:#FF4F1F !important; }
+html[data-theme=“dark”] .pg-title { color:#FFFFFF !important; }
+html[data-theme=“dark”] .pg-sub   { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .t-name   { color:#FFFFFF !important; }
+html[data-theme=“dark”] .t-desc   { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .t-n      { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .t-dur    { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .sci      { background:rgba(255,79,31,.13) !important; border-left-color:#FF4F1F !important; }
+html[data-theme=“dark”] .sci strong { color:#FF4F1F !important; }
+html[data-theme=“dark”] .btn      { background:#FF4F1F !important; }
+html[data-theme=“dark”] .btn-ghost { border-color:#FF4F1F !important; color:#FF4F1F !important; }
+html[data-theme=“dark”] .rule     { background:#363636 !important; }
+html[data-theme=“dark”] .shell    { background:#0a0a0a !important; }
+html[data-theme=“dark”] .thm      { background:#1e1e1e !important; border-color:#363636 !important; }
+html[data-theme=“dark”] .i-sun    { display:block !important; }
+html[data-theme=“dark”] .i-moon   { display:none !important; }
+html[data-theme=“dark”] .prog-rail { background:#1e1e1e !important; }
+html[data-theme=“dark”] .prog-pct  { color:#FF4F1F !important; }
+html[data-theme=“dark”] .arena    { background:#1e1e1e !important; border-color:#363636 !important; }
+html[data-theme=“dark”] .ready    { background:#1e1e1e !important; border-color:#363636 !important; }
+html[data-theme=“dark”] .ready-h  { color:#FFFFFF !important; }
+html[data-theme=“dark”] .ready-p  { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .ready-btn { background:#FF4F1F !important; }
+html[data-theme=“dark”] .t-step   { color:#FF4F1F !important; }
+html[data-theme=“dark”] .t-title  { color:#FFFFFF !important; }
+html[data-theme=“dark”] .instr    { background:#1e1e1e !important; color:#FFFFFF !important; border-left-color:#FF4F1F !important; }
+html[data-theme=“dark”] .hl { color:#FF4F1F !important; }
+html[data-theme=“dark”] .hg { color:#22C55E !important; }
+html[data-theme=“dark”] .hr { color:#EF4444 !important; }
+html[data-theme=“dark”] .rnd { color:#A0A0A0 !important; }
+html[data-theme=“dark”] .dot { background:#1e1e1e !important; border-color:#363636 !important; color:#A0A0A0 !important; }
+html[data-theme=“dark”] .dot.done   { background:rgba(255,79,31,.13) !important; border-color:#FF4F1F !important; color:#FF4F1F !important; }
+html[data-theme=“dark”] .dot.active { border-color:#FF4F1F !important; color:#FF4F1F !important; }
+html[data-theme=“dark”] .a-msg   { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .sp      { border-color:#363636 !important; border-top-color:#FF4F1F !important; }
+html[data-theme=“dark”] .sp-lbl  { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .crt-msg { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .cbt     { background:#141414 !important; }
+html[data-theme=“dark”] .mc      { background:#272727 !important; border-color:#363636 !important; }
+html[data-theme=“dark”] .mbar    { background:#1e1e1e !important; }
+html[data-theme=“dark”] .mbl     { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .mbv     { color:#FFFFFF !important; }
+html[data-theme=“dark”] .mi      { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .gs      { background:#1e1e1e !important; }
+html[data-theme=“dark”] .gsl     { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .gsv     { color:#FFFFFF !important; }
+html[data-theme=“dark”] .sc-panel { background:#1e1e1e !important; border-left-color:#FF4F1F !important; }
+html[data-theme=“dark”] .sc-tag  { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .sc-big  { color:#FF4F1F !important; }
+html[data-theme=“dark”] .sc-of   { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .vp      { background:#1e1e1e !important; }
+html[data-theme=“dark”] .vt      { color:#FFFFFF !important; }
+html[data-theme=“dark”] .vb      { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .sec     { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .sec::after { background:#363636 !important; }
+html[data-theme=“dark”] .rc      { background:#1e1e1e !important; border-color:#363636 !important; }
+html[data-theme=“dark”] .rc-name { color:#FFFFFF !important; }
+html[data-theme=“dark”] .rc-sl   { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .rc-sv   { color:#FFFFFF !important; }
+html[data-theme=“dark”] .rc-desc { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .rc-stat { background:#272727 !important; }
+html[data-theme=“dark”] .rc-bar  { background:#272727 !important; }
+html[data-theme=“dark”] .src-wrap { border-color:#363636 !important; }
+html[data-theme=“dark”] .src-btn { background:#1e1e1e !important; color:#D0D0D0 !important; }
+html[data-theme=“dark”] .src-body { background:#141414 !important; }
+html[data-theme=“dark”] .src-body li { color:#D0D0D0 !important; border-bottom-color:#363636 !important; }
+html[data-theme=“dark”] .src-body b { color:#FFFFFF !important; }
+html[data-theme=“dark”] .src-body li::before { color:#FF4F1F !important; }
+html[data-theme=“dark”] .ovl { background:rgba(239,68,68,.12) !important; color:#EF4444 !important; }
+html[data-theme=“dark”] .stroop-fb { color:#D0D0D0 !important; }
+html[data-theme=“dark”] .srt-f { background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.5),#FF4F1F 42%,#7a1a00) !important; }
+html[data-theme=“dark”] .g-ex { background:rgba(255,79,31,.13) !important; color:#FF4F1F !important; }
+html[data-theme=“dark”] .g-gd { background:rgba(34,197,94,.12) !important; color:#22C55E !important; }
+html[data-theme=“dark”] .g-av { background:rgba(59,130,246,.1) !important; color:#3B82F6 !important; }
+html[data-theme=“dark”] .g-bl { background:rgba(239,68,68,.12) !important; color:#EF4444 !important; }
+html[data-theme=“dark”] .sb[data-c=“RED”]    { background:rgba(239,68,68,.12) !important; border-color:#EF4444 !important; color:#EF4444 !important; }
+html[data-theme=“dark”] .sb[data-c=“BLUE”]   { background:rgba(59,130,246,.1) !important; border-color:#3B82F6 !important; color:#3B82F6 !important; }
+html[data-theme=“dark”] .sb[data-c=“GREEN”]  { background:rgba(34,197,94,.12) !important; border-color:#22C55E !important; color:#22C55E !important; }
+html[data-theme=“dark”] .sb[data-c=“YELLOW”] { background:rgba(245,158,11,.1) !important; border-color:#F59E0B !important; color:#F59E0B !important; }
 
-/* ── Dark mode explicit color rules — same specificity as light rules ── */
-[data-theme=“dark”] .display{color:#FFFFFF !important;}
-[data-theme=“dark”] .display b{color:#FF4F1F !important;}
-[data-theme=“dark”] .pg-title{color:#FFFFFF !important;}
-[data-theme=“dark”] .pg-sub{color:#D0D0D0 !important;}
-[data-theme=“dark”] .t-name{color:#FFFFFF !important;}
-[data-theme=“dark”] .t-desc{color:#D0D0D0 !important;}
-[data-theme=“dark”] .t-n{color:#D0D0D0 !important;}
-[data-theme=“dark”] .t-dur{color:#D0D0D0 !important;}
-[data-theme=“dark”] .t-title{color:#FFFFFF !important;}
-[data-theme=“dark”] .ready-h{color:#FFFFFF !important;}
-[data-theme=“dark”] .ready-p{color:#D0D0D0 !important;}
-[data-theme=“dark”] .kicker{color:#FF4F1F !important;}
-[data-theme=“dark”] .instr{background:#1e1e1e !important;color:#FFFFFF !important;border-left-color:#FF4F1F !important;}
-[data-theme=“dark”] .hl{color:#FF4F1F !important;}
-[data-theme=“dark”] .card{background:#141414 !important;border-color:#363636 !important;border-left-color:#FF4F1F !important;}
-[data-theme=“dark”] .arena{background:#1e1e1e !important;border-color:#363636 !important;}
-[data-theme=“dark”] .ready{background:#1e1e1e !important;border-color:#363636 !important;}
-[data-theme=“dark”] .btn{background:#FF4F1F !important;}
-[data-theme=“dark”] .btn-ghost{border-color:#FF4F1F !important;color:#FF4F1F !important;}
-[data-theme=“dark”] .prog-rail{background:#1e1e1e !important;}
-[data-theme=“dark”] .prog-pct{color:#FF4F1F !important;}
-[data-theme=“dark”] .dot{background:#1e1e1e !important;border-color:#363636 !important;color:#A0A0A0 !important;}
-[data-theme=“dark”] .dot.done{background:rgba(255,79,31,.13) !important;border-color:#FF4F1F !important;color:#FF4F1F !important;}
-[data-theme=“dark”] .dot.active{border-color:#FF4F1F !important;color:#FF4F1F !important;}
-[data-theme=“dark”] .t-step{color:#FF4F1F !important;}
-[data-theme=“dark”] .a-msg{color:#D0D0D0 !important;}
-[data-theme=“dark”] .sp{border-top-color:#FF4F1F !important;border-color:#363636 !important;}
-[data-theme=“dark”] .sp-lbl{color:#D0D0D0 !important;}
-[data-theme=“dark”] .sci{background:rgba(255,79,31,.13) !important;border-left-color:#FF4F1F !important;}
-[data-theme=“dark”] .sci strong{color:#FF4F1F !important;}
-[data-theme=“dark”] .rule{background:#363636 !important;}
-[data-theme=“dark”] .thm{background:#1e1e1e !important;border-color:#363636 !important;}
-[data-theme=“dark”] .crt-msg{color:#D0D0D0 !important;}
-[data-theme=“dark”] .mi{color:#D0D0D0 !important;}
-[data-theme=“dark”] .mc{background:#272727 !important;border-color:#363636 !important;}
-[data-theme=“dark”] .mbar{background:#1e1e1e !important;}
-[data-theme=“dark”] .mbl{color:#D0D0D0 !important;}
-[data-theme=“dark”] .mbv{color:#FFFFFF !important;}
-[data-theme=“dark”] .gsl{color:#D0D0D0 !important;}
-[data-theme=“dark”] .gsv{color:#FFFFFF !important;}
-[data-theme=“dark”] .gs{background:#1e1e1e !important;}
-[data-theme=“dark”] .sc-tag{color:#D0D0D0 !important;}
-[data-theme=“dark”] .sc-big{color:#FF4F1F !important;}
-[data-theme=“dark”] .sc-of{color:#D0D0D0 !important;}
-[data-theme=“dark”] .vp{background:#1e1e1e !important;}
-[data-theme=“dark”] .vt{color:#FFFFFF !important;}
-[data-theme=“dark”] .vb{color:#D0D0D0 !important;}
-[data-theme=“dark”] .sec{color:#D0D0D0 !important;}
-[data-theme=“dark”] .sec::after{background:#363636 !important;}
-[data-theme=“dark”] .rc{background:#1e1e1e !important;border-color:#363636 !important;}
-[data-theme=“dark”] .rc-name{color:#FFFFFF !important;}
-[data-theme=“dark”] .rc-sl{color:#D0D0D0 !important;}
-[data-theme=“dark”] .rc-sv{color:#FFFFFF !important;}
-[data-theme=“dark”] .rc-desc{color:#D0D0D0 !important;}
-[data-theme=“dark”] .rc-stat{background:#272727 !important;}
-[data-theme=“dark”] .rc-bar{background:#272727 !important;}
-[data-theme=“dark”] .sc-panel{background:#1e1e1e !important;border-left-color:#FF4F1F !important;}
-[data-theme=“dark”] .src-btn{background:#1e1e1e !important;color:#D0D0D0 !important;}
-[data-theme=“dark”] .src-btn:hover{color:#FF4F1F !important;}
-[data-theme=“dark”] .src-body{background:#141414 !important;}
-[data-theme=“dark”] .src-body li{color:#D0D0D0 !important;border-bottom-color:#363636 !important;}
-[data-theme=“dark”] .src-body b{color:#FFFFFF !important;}
-[data-theme=“dark”] .src-wrap{border-color:#363636 !important;}
-[data-theme=“dark”] .src-body li::before{color:#FF4F1F !important;}
-[data-theme=“dark”] .rnd{color:#A0A0A0 !important;}
-[data-theme=“dark”] .hg{color:#22C55E !important;}
-[data-theme=“dark”] .hr{color:#EF4444 !important;}
-[data-theme=“dark”] .stroop-fb{color:#D0D0D0 !important;}
-[data-theme=“dark”] .srt-f{background:radial-gradient(circle at 38% 32%,rgba(255,255,255,.5),#FF4F1F 42%,#7a1a00) !important;}
-[data-theme=“dark”] .ovl{background:rgba(239,68,68,.12) !important;color:#EF4444 !important;}
-[data-theme=“dark”] html{background:#0a0a0a !important;}
+/* ── LIGHT ── */
+html[data-theme=“light”] { background:#F0EBE0; }
+html[data-theme=“light”] body { background:#F0EBE0 !important; color:#444444 !important; }
+html[data-theme=“light”] .card  { background:#FFFFFF !important; border-color:#C8C0B0 !important; border-left-color:#C83000 !important; }
+html[data-theme=“light”] .display { color:#111111 !important; }
+html[data-theme=“light”] .display b { color:#C83000 !important; }
+html[data-theme=“light”] .kicker  { color:#C83000 !important; }
+html[data-theme=“light”] .pg-title { color:#111111 !important; }
+html[data-theme=“light”] .pg-sub   { color:#444444 !important; }
+html[data-theme=“light”] .t-name   { color:#111111 !important; }
+html[data-theme=“light”] .t-desc   { color:#444444 !important; }
+html[data-theme=“light”] .t-n      { color:#444444 !important; }
+html[data-theme=“light”] .t-dur    { color:#444444 !important; }
+html[data-theme=“light”] .sci      { background:rgba(200,48,0,.1) !important; border-left-color:#C83000 !important; }
+html[data-theme=“light”] .sci strong { color:#C83000 !important; }
+html[data-theme=“light”] .btn      { background:#C83000 !important; }
+html[data-theme=“light”] .btn-ghost { border-color:#C83000 !important; color:#C83000 !important; }
+html[data-theme=“light”] .rule     { background:#C8C0B0 !important; }
+html[data-theme=“light”] .shell    { background:#F0EBE0 !important; }
+html[data-theme=“light”] .thm      { background:#EAE4DA !important; border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .i-sun    { display:none !important; }
+html[data-theme=“light”] .i-moon   { display:block !important; }
+html[data-theme=“light”] .prog-rail { background:#EAE4DA !important; }
+html[data-theme=“light”] .prog-pct  { color:#C83000 !important; }
+html[data-theme=“light”] .arena    { background:#EAE4DA !important; border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .ready    { background:#EAE4DA !important; border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .ready-h  { color:#111111 !important; }
+html[data-theme=“light”] .ready-p  { color:#444444 !important; }
+html[data-theme=“light”] .ready-btn { background:#C83000 !important; }
+html[data-theme=“light”] .t-step   { color:#C83000 !important; }
+html[data-theme=“light”] .t-title  { color:#111111 !important; }
+html[data-theme=“light”] .instr    { background:#EAE4DA !important; color:#111111 !important; border-left-color:#C83000 !important; }
+html[data-theme=“light”] .hl { color:#C83000 !important; }
+html[data-theme=“light”] .hg { color:#166534 !important; }
+html[data-theme=“light”] .hr { color:#B91C1C !important; }
+html[data-theme=“light”] .rnd { color:#777777 !important; }
+html[data-theme=“light”] .dot { background:#EAE4DA !important; border-color:#C8C0B0 !important; color:#777777 !important; }
+html[data-theme=“light”] .dot.done   { background:rgba(200,48,0,.1) !important; border-color:#C83000 !important; color:#C83000 !important; }
+html[data-theme=“light”] .dot.active { border-color:#C83000 !important; color:#C83000 !important; }
+html[data-theme=“light”] .a-msg   { color:#444444 !important; }
+html[data-theme=“light”] .sp      { border-color:#C8C0B0 !important; border-top-color:#C83000 !important; }
+html[data-theme=“light”] .sp-lbl  { color:#444444 !important; }
+html[data-theme=“light”] .crt-msg { color:#444444 !important; }
+html[data-theme=“light”] .cbt     { background:#EAE4DA !important; }
+html[data-theme=“light”] .mc      { background:#DDD8CC !important; border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .mbar    { background:#EAE4DA !important; }
+html[data-theme=“light”] .mbl     { color:#444444 !important; }
+html[data-theme=“light”] .mbv     { color:#111111 !important; }
+html[data-theme=“light”] .mi      { color:#444444 !important; }
+html[data-theme=“light”] .gs      { background:#EAE4DA !important; }
+html[data-theme=“light”] .gsl     { color:#444444 !important; }
+html[data-theme=“light”] .gsv     { color:#111111 !important; }
+html[data-theme=“light”] .sc-panel { background:#EAE4DA !important; border-left-color:#C83000 !important; }
+html[data-theme=“light”] .sc-tag  { color:#444444 !important; }
+html[data-theme=“light”] .sc-big  { color:#C83000 !important; }
+html[data-theme=“light”] .sc-of   { color:#444444 !important; }
+html[data-theme=“light”] .vp      { background:#EAE4DA !important; }
+html[data-theme=“light”] .vt      { color:#111111 !important; }
+html[data-theme=“light”] .vb      { color:#444444 !important; }
+html[data-theme=“light”] .sec     { color:#444444 !important; }
+html[data-theme=“light”] .sec::after { background:#C8C0B0 !important; }
+html[data-theme=“light”] .rc      { background:#EAE4DA !important; border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .rc-name { color:#111111 !important; }
+html[data-theme=“light”] .rc-sl   { color:#444444 !important; }
+html[data-theme=“light”] .rc-sv   { color:#111111 !important; }
+html[data-theme=“light”] .rc-desc { color:#444444 !important; }
+html[data-theme=“light”] .rc-stat { background:#DDD8CC !important; }
+html[data-theme=“light”] .rc-bar  { background:#DDD8CC !important; }
+html[data-theme=“light”] .src-wrap { border-color:#C8C0B0 !important; }
+html[data-theme=“light”] .src-btn { background:#EAE4DA !important; color:#444444 !important; }
+html[data-theme=“light”] .src-body { background:#FFFFFF !important; }
+html[data-theme=“light”] .src-body li { color:#444444 !important; border-bottom-color:#C8C0B0 !important; }
+html[data-theme=“light”] .src-body b { color:#111111 !important; }
+html[data-theme=“light”] .src-body li::before { color:#C83000 !important; }
+html[data-theme=“light”] .ovl { background:rgba(185,28,28,.1) !important; color:#B91C1C !important; }
+html[data-theme=“light”] .stroop-fb { color:#444444 !important; }
+html[data-theme=“light”] .srt-f { background:radial-gradient(circle at 38% 32%,#fff,#C83000 40%,#5a0e00) !important; }
+html[data-theme=“light”] .g-ex { background:rgba(200,48,0,.1) !important; color:#C83000 !important; }
+html[data-theme=“light”] .g-gd { background:rgba(22,101,52,.1) !important; color:#166534 !important; }
+html[data-theme=“light”] .g-av { background:rgba(29,78,216,.1) !important; color:#1D4ED8 !important; }
+html[data-theme=“light”] .g-bl { background:rgba(185,28,28,.1) !important; color:#B91C1C !important; }
+html[data-theme=“light”] .sb[data-c=“RED”]    { background:rgba(185,28,28,.1) !important; border-color:#B91C1C !important; color:#B91C1C !important; }
+html[data-theme=“light”] .sb[data-c=“BLUE”]   { background:rgba(29,78,216,.1) !important; border-color:#1D4ED8 !important; color:#1D4ED8 !important; }
+html[data-theme=“light”] .sb[data-c=“GREEN”]  { background:rgba(22,101,52,.1) !important; border-color:#166534 !important; color:#166534 !important; }
+html[data-theme=“light”] .sb[data-c=“YELLOW”] { background:rgba(146,64,14,.1) !important; border-color:#92400E !important; color:#92400E !important; }
 
 /* ============================================================
 BASE
@@ -401,7 +416,7 @@ RESULTS
 </style>
 </head>
 
-<button class="thm" id="J-theme" onclick="var t=document.documentElement,n=t.getAttribute('data-theme')=='light'?'dark':'light';t.setAttribute('data-theme',n);try{localStorage.setItem('bst',n);}catch(e){}"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
+<button class="thm" id="J-theme" onclick="toggleTheme()"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
 
 <div class="shell"><div class="card">
 
@@ -595,9 +610,13 @@ function go(id){
 }
 
 /* ── theme ── */
+function toggleTheme(){
+  var h=document.documentElement;
+  var n=h.getAttribute('data-theme')==='light'?'dark':'light';
+  h.setAttribute('data-theme',n);
+  try{localStorage.setItem('bst',n);}catch(e){}
+}
 
-// Ensure dark on load
-document.documentElement.setAttribute('data-theme','dark');
 
 /* ── dots ── */
 function mkDots(cid,n){
