@@ -900,7 +900,7 @@ $('J-restart').addEventListener('click',function(){
 });
 
 /* Global wrapper functions so onclick attributes always work */
-function toggleTheme(){ document.getElementById('J-theme').dispatchEvent(new Event('_thm')); }
+function toggleTheme(){ var h=document.documentElement; setTheme(h.getAttribute('data-theme')==='light'?'dark':'light'); }
 function startBattery(){ go('screen-srt'); }
 function beginSRT(){ H('srt-ready'); S('srt-run'); iSRT(); }
 function beginCRT(){ H('crt-ready'); S('crt-run'); iCRT(); }
