@@ -13,7 +13,7 @@ TOKENS  —  dark is :root default, light overrides
 :root {
 –bg:#0a0a0a; –card:#141414; –surf:#1e1e1e;
 –lift:#272727; –line:#363636;
-–t1:#F2F2F2; –t2:#B8B8B8; –t3:#888;
+–t1:#FFFFFF; –t2:#D0D0D0; –t3:#A0A0A0;
 –fire:#FF4F1F; –fire-lo:rgba(255,79,31,.13);
 –go:#22C55E;   –go-lo:rgba(34,197,94,.12);
 –stop:#EF4444; –stop-lo:rgba(239,68,68,.12);
@@ -30,6 +30,34 @@ TOKENS  —  dark is :root default, light overrides
 –blue:#1D4ED8; –gold:#92400E;
 –sh:0 8px 32px rgba(0,0,0,.1);
 }
+/* Light mode: explicit overrides so every element switches correctly */
+html[data-theme=“light”]{background:#F0EBE0 !important;}
+html[data-theme=“light”] body{background:#F0EBE0 !important;color:#444 !important;}
+html[data-theme=“light”] .card{background:#fff !important;border-color:#C8C0B0 !important;border-left-color:#C83000 !important;}
+html[data-theme=“light”] .arena{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
+html[data-theme=“light”] .ready{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
+html[data-theme=“light”] .shell{background:#F0EBE0 !important;}
+html[data-theme=“light”] .screen{color:#444 !important;}
+html[data-theme=“light”] .display{color:#111 !important;}
+html[data-theme=“light”] .t-name{color:#111 !important;}
+html[data-theme=“light”] .t-desc{color:#444 !important;}
+html[data-theme=“light”] .kicker{color:#C83000 !important;}
+html[data-theme=“light”] .btn{background:#C83000 !important;}
+html[data-theme=“light”] .btn-ghost{border-color:#C83000 !important;color:#C83000 !important;}
+html[data-theme=“light”] .t-title{color:#111 !important;}
+html[data-theme=“light”] .instr{background:#EAE4DA !important;color:#111 !important;border-left-color:#C83000 !important;}
+html[data-theme=“light”] .ready-h{color:#111 !important;}
+html[data-theme=“light”] .ready-p{color:#444 !important;}
+html[data-theme=“light”] .ready-btn{background:#C83000 !important;}
+html[data-theme=“light”] .prog-rail{background:#EAE4DA !important;}
+html[data-theme=“light”] .dot{background:#EAE4DA !important;border-color:#C8C0B0 !important;color:#777 !important;}
+html[data-theme=“light”] .spw .sp{border-top-color:#C83000 !important;border-color:#C8C0B0 !important;}
+html[data-theme=“light”] .sci{background:rgba(200,48,0,.1) !important;}
+html[data-theme=“light”] .mbar{background:#EAE4DA !important;}
+html[data-theme=“light”] .glive .gs{background:#EAE4DA !important;}
+html[data-theme=“light”] .mc{background:#DDD8CC !important;border-color:#C8C0B0 !important;}
+html[data-theme=“light”] .mbv,.html[data-theme=“light”] .gsv{color:#111 !important;}
+html[data-theme=“light”] .thm{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
 /* ============================================================
 BASE
 ============================================================ */
@@ -40,14 +68,13 @@ min-height:100%;
 background:#0a0a0a;
 background:var(–bg);
 font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,‘Helvetica Neue’,Arial,sans-serif;
-color:#B8B8B8;
+color:#D0D0D0;
 color:var(–t2);
 overflow-x:hidden;
 transition:background .3s,color .3s;
 }
 /* Light mode direct overrides — in addition to CSS vars */
-[data-theme=“light”] html,[data-theme=“light”] body{background:#F0EBE0;color:#444;}
-[data-theme=“light”] body{background:#F0EBE0;}
+html[data-theme=“light”],html[data-theme=“light”] body{background:#F0EBE0 !important;color:#444 !important;}
 /* ============================================================
 LAYOUT
 ============================================================ */
@@ -458,16 +485,13 @@ function go(id){
 /* ── theme ── */
 function setTheme(n){
   d.documentElement.setAttribute('data-theme',n);
-  // Also set direct colors as fallback for browsers where CSS vars fail
-  if(n==='light'){
-    d.documentElement.style.background='#F0EBE0';
-    d.body.style.background='#F0EBE0';
-    d.body.style.color='#444';
-  } else {
-    d.documentElement.style.background='#0a0a0a';
-    d.body.style.background='#0a0a0a';
-    d.body.style.color='#B8B8B8';
-  }
+  var dark=n!=='light';
+  d.documentElement.style.background=dark?'#0a0a0a':'#F0EBE0';
+  d.body.style.background=dark?'#0a0a0a':'#F0EBE0';
+  d.body.style.color=dark?'#D0D0D0':'#444';
+  // Update card and shell directly so iOS sees changes immediately
+  var card=d.querySelector('.card');
+  if(card){card.style.background=dark?'#141414':'#fff';card.style.borderColor=dark?'#363636':'#C8C0B0';card.style.borderLeftColor=dark?'#FF4F1F':'#C83000';}
   try{localStorage.setItem('bst',n);}catch(e){}
 }
 $('J-theme').addEventListener('click',function(){
