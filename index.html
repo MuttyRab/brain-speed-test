@@ -8,7 +8,7 @@
 <style>
 
 /* ============================================================
-TOKENS  —  dark is :root default, light overrides
+TOKENS — dark on :root (default), light overrides on html
 ============================================================ */
 :root {
 –bg:#0a0a0a; –card:#141414; –surf:#1e1e1e;
@@ -20,61 +20,30 @@ TOKENS  —  dark is :root default, light overrides
 –blue:#3B82F6; –gold:#F59E0B;
 –sh:0 20px 60px rgba(0,0,0,.85);
 }
+/* Light mode — redefines all vars. Everything using var() updates automatically. */
 [data-theme=“light”] {
-–bg:#F0EBE0; –card:#fff; –surf:#EAE4DA;
+–bg:#F0EBE0; –card:#FFFFFF; –surf:#EAE4DA;
 –lift:#DDD8CC; –line:#C8C0B0;
-–t1:#111; –t2:#444; –t3:#777;
+–t1:#111111; –t2:#444444; –t3:#777777;
 –fire:#C83000; –fire-lo:rgba(200,48,0,.1);
 –go:#166534;   –go-lo:rgba(22,101,52,.1);
 –stop:#B91C1C; –stop-lo:rgba(185,28,28,.1);
 –blue:#1D4ED8; –gold:#92400E;
 –sh:0 8px 32px rgba(0,0,0,.1);
 }
-/* Light mode: explicit overrides so every element switches correctly */
-html[data-theme=“light”]{background:#F0EBE0 !important;}
-html[data-theme=“light”] body{background:#F0EBE0 !important;color:#444 !important;}
-html[data-theme=“light”] .card{background:#fff !important;border-color:#C8C0B0 !important;border-left-color:#C83000 !important;}
-html[data-theme=“light”] .arena{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-html[data-theme=“light”] .ready{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
-html[data-theme=“light”] .shell{background:#F0EBE0 !important;}
-html[data-theme=“light”] .screen{color:#444 !important;}
-html[data-theme=“light”] .display{color:#111 !important;}
-html[data-theme=“light”] .t-name{color:#111 !important;}
-html[data-theme=“light”] .t-desc{color:#444 !important;}
-html[data-theme=“light”] .kicker{color:#C83000 !important;}
-html[data-theme=“light”] .btn{background:#C83000 !important;}
-html[data-theme=“light”] .btn-ghost{border-color:#C83000 !important;color:#C83000 !important;}
-html[data-theme=“light”] .t-title{color:#111 !important;}
-html[data-theme=“light”] .instr{background:#EAE4DA !important;color:#111 !important;border-left-color:#C83000 !important;}
-html[data-theme=“light”] .ready-h{color:#111 !important;}
-html[data-theme=“light”] .ready-p{color:#444 !important;}
-html[data-theme=“light”] .ready-btn{background:#C83000 !important;}
-html[data-theme=“light”] .prog-rail{background:#EAE4DA !important;}
-html[data-theme=“light”] .dot{background:#EAE4DA !important;border-color:#C8C0B0 !important;color:#777 !important;}
-html[data-theme=“light”] .spw .sp{border-top-color:#C83000 !important;border-color:#C8C0B0 !important;}
-html[data-theme=“light”] .sci{background:rgba(200,48,0,.1) !important;}
-html[data-theme=“light”] .mbar{background:#EAE4DA !important;}
-html[data-theme=“light”] .glive .gs{background:#EAE4DA !important;}
-html[data-theme=“light”] .mc{background:#DDD8CC !important;border-color:#C8C0B0 !important;}
-html[data-theme=“light”] .mbv,.html[data-theme=“light”] .gsv{color:#111 !important;}
-html[data-theme=“light”] .thm{background:#EAE4DA !important;border-color:#C8C0B0 !important;}
 /* ============================================================
 BASE
 ============================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{height:100%;-webkit-font-smoothing:antialiased;background:#0a0a0a;}
+html{height:100%;-webkit-font-smoothing:antialiased;background:var(–bg);}
 body{
 min-height:100%;
-background:#0a0a0a;
 background:var(–bg);
 font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,‘Helvetica Neue’,Arial,sans-serif;
-color:#D0D0D0;
 color:var(–t2);
 overflow-x:hidden;
 transition:background .3s,color .3s;
 }
-/* Light mode direct overrides — in addition to CSS vars */
-html[data-theme=“light”],html[data-theme=“light”] body{background:#F0EBE0 !important;color:#444 !important;}
 /* ============================================================
 LAYOUT
 ============================================================ */
@@ -85,8 +54,7 @@ LAYOUT
 .i-sun{display:block;} .i-moon{display:none;}
 [data-theme=“light”] .i-sun{display:none;} [data-theme=“light”] .i-moon{display:block;}
 /* Card */
-.card{width:min(580px,100%);background:#141414;background:var(–card);border:1px solid #363636;border:1px solid var(–line);border-radius:8px;border-left:4px solid #FF4F1F;border-left:4px solid var(–fire);box-shadow:var(–sh);overflow:hidden;transition:background .3s,border-color .3s;}
-[data-theme=“light”] .card{background:#fff;border-color:#C8C0B0;border-left-color:#C83000;}
+.card{width:min(580px,100%);background:var(–card);border:1px solid var(–line);border-radius:8px;border-left:4px solid var(–fire);box-shadow:var(–sh);overflow:hidden;transition:background .3s,border-color .3s;}
 /* Screens */
 .screen{display:none;padding:clamp(20px,5vw,40px) clamp(18px,5vw,36px) clamp(22px,5vw,36px);}
 .screen.active{display:block;animation:fadein .38s cubic-bezier(.22,1,.36,1) both;}
@@ -94,10 +62,8 @@ LAYOUT
 /* ============================================================
 TYPOGRAPHY
 ============================================================ */
-.kicker{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#FF4F1F;color:var(–fire);margin-bottom:12px;font-weight:600;}
-[data-theme=“light”] .kicker{color:#C83000;}
-.display{font-size:clamp(44px,11vw,72px);font-weight:800;color:#F2F2F2;color:var(–t1);line-height:.95;letter-spacing:-2px;margin-bottom:4px;}
-[data-theme=“light”] .display{color:#111;}
+.kicker{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(–fire);margin-bottom:12px;font-weight:600;}
+.display{font-size:clamp(44px,11vw,72px);font-weight:800;color:var(–t1);line-height:.95;letter-spacing:-2px;margin-bottom:4px;}
 .display b{color:var(–fire);}
 .pg-title{font-size:clamp(24px,6vw,36px);font-weight:800;color:var(–t1);letter-spacing:-1px;line-height:1.1;}
 .pg-sub{font-size:clamp(15px,3.5vw,17px);color:var(–t2);line-height:1.7;margin-top:14px;}
@@ -119,8 +85,7 @@ INTRO LIST
 /* ============================================================
 BUTTONS
 ============================================================ */
-.btn{display:block;width:100%;padding:17px;background:#FF4F1F;background:var(–fire);border:none;border-radius:6px;color:#fff;font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:opacity .18s,transform .15s;}
-[data-theme=“light”] .btn{background:#C83000;}
+.btn{display:block;width:100%;padding:17px;background:var(–fire);border:none;border-radius:6px;color:#fff;font-size:17px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:opacity .18s,transform .15s;}
 .btn:hover{opacity:.88;} .btn:active{transform:scale(.98);}
 .btn-ghost{display:block;width:100%;padding:15px;background:transparent;border:2px solid var(–fire);border-radius:6px;color:var(–fire);font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .18s,color .18s;}
 .btn-ghost:hover{background:var(–fire);color:#fff;}
@@ -154,8 +119,7 @@ DOTS
 /* ============================================================
 READY SCREEN
 ============================================================ */
-.ready{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px;background:#1e1e1e;background:var(–surf);border:1px solid #363636;border:1px solid var(–line);border-radius:8px;margin-bottom:16px;text-align:center;}
-[data-theme=“light”] .ready{background:#EAE4DA;border-color:#C8C0B0;}
+.ready{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px;background:var(–surf);border:1px solid var(–line);border-radius:8px;margin-bottom:16px;text-align:center;}
 .ready-ic{font-size:38px;}
 .ready-h{font-size:clamp(18px,4vw,22px);font-weight:800;color:var(–t1);}
 .ready-p{font-size:15px;color:var(–t2);line-height:1.6;max-width:300px;}
@@ -164,8 +128,7 @@ READY SCREEN
 /* ============================================================
 ARENA
 ============================================================ */
-.arena{position:relative;display:flex;align-items:center;justify-content:center;background:#1e1e1e;background:var(–surf);border:1px solid #363636;border:1px solid var(–line);border-radius:8px;margin-bottom:16px;overflow:hidden;}
-[data-theme=“light”] .arena{background:#EAE4DA;border-color:#C8C0B0;}
+.arena{position:relative;display:flex;align-items:center;justify-content:center;background:var(–surf);border:1px solid var(–line);border-radius:8px;margin-bottom:16px;overflow:hidden;}
 .arena-fixed{min-height:clamp(220px,45vw,300px);}
 @media(min-width:480px){.arena-fixed{min-height:clamp(260px,38vh,340px);}}
 .arena-auto{padding:20px 14px;flex-direction:column;}
@@ -484,14 +447,8 @@ function go(id){
 
 /* ── theme ── */
 function setTheme(n){
+  // Only set the attribute — CSS vars do all the visual work automatically
   d.documentElement.setAttribute('data-theme',n);
-  var dark=n!=='light';
-  d.documentElement.style.background=dark?'#0a0a0a':'#F0EBE0';
-  d.body.style.background=dark?'#0a0a0a':'#F0EBE0';
-  d.body.style.color=dark?'#D0D0D0':'#444';
-  // Update card and shell directly so iOS sees changes immediately
-  var card=d.querySelector('.card');
-  if(card){card.style.background=dark?'#141414':'#fff';card.style.borderColor=dark?'#363636':'#C8C0B0';card.style.borderLeftColor=dark?'#FF4F1F':'#C83000';}
   try{localStorage.setItem('bst',n);}catch(e){}
 }
 $('J-theme').addEventListener('click',function(){
