@@ -191,7 +191,6 @@ color:var(–t2);
 overflow-x:hidden;
 transition:background .4s,color .4s;
 }
-*{transition:background-color .4s,color .4s,border-color .4s;}
 /* ============================================================
 LAYOUT
 ============================================================ */
@@ -199,8 +198,9 @@ LAYOUT
 /* Theme toggle */
 .thm{position:fixed;top:14px;right:14px;z-index:300;width:40px;height:40px;border-radius:6px;background:var(–surf);border:1px solid var(–line);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,transform .15s;box-shadow:var(–sh);}
 .thm:hover{border-color:var(–fire);transform:scale(1.08);}
-[data-theme=“dark”] .i-sun{display:block !important;} [data-theme=“dark”] .i-moon{display:none !important;}
+.i-sun{display:block;} .i-moon{display:none;}
 [data-theme=“light”] .i-sun{display:none !important;} [data-theme=“light”] .i-moon{display:block !important;}
+[data-theme=“dark”] .i-sun{display:block !important;} [data-theme=“dark”] .i-moon{display:none !important;}
 /* Card */
 .card{width:min(580px,100%);background:var(–card);border:1px solid var(–line);border-radius:8px;border-left:4px solid var(–fire);box-shadow:var(–sh);overflow:hidden;transition:background .3s,border-color .3s;}
 /* Screens */
@@ -599,8 +599,11 @@ function setTheme(n){
   d.documentElement.setAttribute('data-theme',n);
   try{localStorage.setItem('bst',n);}catch(e){}
 }
-// Default to dark
-(function(){ setTheme('dark'); })();
+// Always start dark, clear any saved pref
+(function(){
+  try{localStorage.removeItem('bst');}catch(e){}
+  setTheme('dark');
+})();
 
 /* ── dots ── */
 function mkDots(cid,n){
