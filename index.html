@@ -32,7 +32,6 @@ TOKENS — dark on :root (default), light overrides on html
 –sh:0 8px 32px rgba(0,0,0,.1) !important;
 }
 /* ── Light mode explicit color rules (no vars — 100% reliable on all iOS) ── */
-[data-theme=“light”] body{background:#F0EBE0 !important;color:#444444 !important;}
 [data-theme=“light”] .display{color:#111111 !important;}
 [data-theme=“light”] .display b{color:#C83000 !important;}
 [data-theme=“light”] .pg-title{color:#111111 !important;}
@@ -104,8 +103,11 @@ TOKENS — dark on :root (default), light overrides on html
 [data-theme=“light”] .srt-f{background:radial-gradient(circle at 38% 32%,#fff,#C83000 40%,#5a0e00) !important;}
 [data-theme=“light”] .ovl{background:rgba(185,28,28,.1) !important;color:#B91C1C !important;}
 
+/* ── html and body: hardcoded per theme, no vars ── */
+[data-theme=“dark”] html,[data-theme=“dark”] body{background:#0a0a0a !important;color:#D0D0D0 !important;}
+[data-theme=“light”] html,[data-theme=“light”] body{background:#F0EBE0 !important;color:#444444 !important;}
+
 /* ── Dark mode explicit color rules — same specificity as light rules ── */
-[data-theme=“dark”] body{background:#0a0a0a !important;color:#D0D0D0 !important;}
 [data-theme=“dark”] .display{color:#FFFFFF !important;}
 [data-theme=“dark”] .display b{color:#FF4F1F !important;}
 [data-theme=“dark”] .pg-title{color:#FFFFFF !important;}
@@ -182,14 +184,13 @@ TOKENS — dark on :root (default), light overrides on html
 BASE
 ============================================================ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html{height:100%;-webkit-font-smoothing:antialiased;background:var(–bg);transition:background .4s;}
+html{height:100%;-webkit-font-smoothing:antialiased;background:#0a0a0a;}
 body{
 min-height:100%;
-background:var(–bg);
+background:#0a0a0a;
+color:#D0D0D0;
 font-family:-apple-system,BlinkMacSystemFont,‘Segoe UI’,‘Helvetica Neue’,Arial,sans-serif;
-color:var(–t2);
 overflow-x:hidden;
-transition:background .4s,color .4s;
 }
 /* ============================================================
 LAYOUT
@@ -594,16 +595,9 @@ function go(id){
 }
 
 /* ── theme ── */
-function setTheme(n){
-  // Only set the attribute — CSS vars do all the visual work automatically
-  d.documentElement.setAttribute('data-theme',n);
-  try{localStorage.setItem('bst',n);}catch(e){}
-}
-// Always start dark, clear any saved pref
-(function(){
-  try{localStorage.removeItem('bst');}catch(e){}
-  setTheme('dark');
-})();
+
+// Ensure dark on load
+document.documentElement.setAttribute('data-theme','dark');
 
 /* ── dots ── */
 function mkDots(cid,n){
