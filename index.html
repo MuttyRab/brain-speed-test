@@ -399,7 +399,7 @@ RESULTS
 </style>
 </head>
 
-<button class="thm" id="J-theme" onclick="toggleTheme()"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
+<button class="thm" id="J-theme" onclick="var t=document.documentElement,n=t.getAttribute('data-theme')=='light'?'dark':'light';t.setAttribute('data-theme',n);try{localStorage.setItem('bst',n);}catch(e){}"><span class="i-sun">☀️</span><span class="i-moon">🌙</span></button>
 
 <div class="shell"><div class="card">
 
@@ -896,7 +896,7 @@ $('J-restart').addEventListener('click',function(){
 });
 
 /* Global wrapper functions so onclick attributes always work */
-function toggleTheme(){ var h=document.documentElement; setTheme(h.getAttribute('data-theme')==='light'?'dark':'light'); }
+
 function startBattery(){ go('screen-srt'); }
 function beginSRT(){ H('srt-ready'); S('srt-run'); iSRT(); }
 function beginCRT(){ H('crt-ready'); S('crt-run'); iCRT(); }
