@@ -16,8 +16,8 @@ jobs:
       - name: Confirm Node runtime
         run: node --version && npm --version
       - run: npm install
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - name: Desktop full battery
         run: npm run test:e2e -- --project=desktop-chromium --reporter=line
-      - name: Mobile full battery
+      - name: Mobile Safari full battery
         run: npm run test:e2e -- --project=mobile-safari-size --reporter=line
