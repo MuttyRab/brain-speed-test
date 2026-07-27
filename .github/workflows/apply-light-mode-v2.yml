@@ -1,0 +1,37 @@
+name: Apply redesigned light mode
+
+on:
+  push:
+    branches:
+      - fix/light-mode-redesign
+    paths:
+      - light-mode-v2.css
+      - .github/workflows/apply-light-mode-v2.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/light-mode-redesign
+      - name: Add the light theme stylesheet
+        run: |
+          if ! grep -q 'light-mode-v2.css' index.html; then
+            sed -i '/styles.css/a\  <link rel="stylesheet" href="light-mode-v2.css">' index.html
+          fi
+          sed -i "s/light ? '#ecebe6' : '#060812'/light ? '#f4f7fb' : '#060812'/" app.js
+      - name: Commit generated wiring
+        run: |
+          if git diff --quiet; then
+            echo 'Nothing to update.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html app.js
+          git commit -m 'Apply redesigned light mode'
+          git push origin HEAD:fix/light-mode-redesign
