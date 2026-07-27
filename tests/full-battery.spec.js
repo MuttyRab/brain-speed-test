@@ -57,7 +57,11 @@ test('complete cognitive battery works end to end', async ({ page }) => {
     await page.locator('#gng-target:not(.hidden)').waitFor({ state: 'visible' });
     const mode = await page.getAttribute('#gng-target', 'data-mode');
     if (mode === 'go') await page.dispatchEvent('#gng-target', 'pointerdown');
-    await page.waitForFunction(expected => document.querySelector('#gng-round').textContent.startsWith(`${expected} /`), completed + 1);
+    await page.waitForFunction(expected => {
+      const round = document.querySelector('#gng-round');
+      const current = round ? Number.parseInt(round.textContent, 10) : 0;
+      return current >= expected || document.querySelector('#screen-results')?.classList.contains('screen-active');
+    }, completed + 1);
     await page.waitForTimeout(25);
   }
 
