@@ -17,4 +17,7 @@ jobs:
         run: node --version && npm --version
       - run: npm install
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Desktop full battery
+        run: npm run test:e2e -- --project=desktop-chromium --reporter=line
+      - name: Mobile full battery
+        run: npm run test:e2e -- --project=mobile-safari-size --reporter=line
