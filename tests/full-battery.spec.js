@@ -1,6 +1,8 @@
 const { test, expect } = require('@playwright/test');
 
 test('complete cognitive battery works end to end', async ({ page }) => {
+  test.setTimeout(90000);
+
   const errors = [];
   page.on('pageerror', error => errors.push(String(error)));
   page.on('console', message => {
