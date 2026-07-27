@@ -1,39 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070a0f">
-<title>Brain Speed Test</title>
-<style>
-*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#070a0f;color:#f4f1e8;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}.boot{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 20% 10%,rgba(111,140,255,.14),transparent 35rem),#070a0f}.boot-inner{display:flex;flex-direction:column;align-items:center;gap:16px}.boot-mark{width:52px;height:52px;border:1px solid #35445a;border-top-color:#c9ff46;border-radius:50%;animation:spin .85s linear infinite;box-shadow:0 0 0 9px rgba(201,255,70,.025)}.boot-label{font:700 10px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.18em;color:#98a5b5;text-transform:uppercase}@keyframes spin{to{transform:rotate(360deg)}}.error{max-width:420px;padding:28px;text-align:center;line-height:1.6}.error b{display:block;margin-bottom:8px;color:#c9ff46}.error button{margin-top:16px;padding:12px 18px;border:1px solid #c9ff46;border-radius:10px;background:#c9ff46;color:#11150a;font-weight:750;cursor:pointer}@media(prefers-reduced-motion:reduce){.boot-mark{animation-duration:2s}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#060812">
+  <meta name="description" content="A five-part cognitive speed assessment measuring reaction, decision, focus, memory, and inhibitory control.">
+  <title>Brain Speed Test</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="boot" id="boot"><div class="boot-inner"><div class="boot-mark"></div><div class="boot-label">Calibrating assessment</div></div></div>
-<script>
-(function(){
-  var ORIGINAL='https://raw.githubusercontent.com/MuttyRab/brain-speed-test/b5cc2acab5627aacf041ee4f5508709f2b940df9/index.html';
-  var STYLES=['redesign-1.css','redesign-2.css','redesign-3.css'];
-  function get(url){return fetch(url,{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('Request failed: '+r.status);return r.text();});}
-  Promise.all([get(ORIGINAL)].concat(STYLES.map(get))).then(function(parts){
-    var source=parts.shift();
-    var css=parts.join('\n');
-    source=source.replace('<meta name="theme-color" content="#0a0a0a">','<meta name="theme-color" content="#070a0f">');
-    source=source.replace('</head>','<style id="instrument-visual-overhaul">'+css+'</style></head>');
-    var frame=document.createElement('iframe');
-    frame.title='Brain Speed Test cognitive assessment';
-    frame.setAttribute('allow','clipboard-write');
-    frame.style.cssText='position:fixed;inset:0;width:100%;height:100%;height:100dvh;border:0;background:#070a0f;display:block';
-    frame.onload=function(){var boot=document.getElementById('boot');if(boot)boot.remove();};
-    frame.srcdoc=source;
-    document.body.appendChild(frame);
-  }).catch(function(err){
-    var boot=document.getElementById('boot');
-    boot.innerHTML='<div class="error"><b>Assessment could not load.</b>Check your connection and try again.<br><button onclick="location.reload()">Retry</button></div>';
-    console.error(err);
-  });
-})();
-</script>
+  <canvas id="neural-canvas" aria-hidden="true"></canvas>
+  <div class="aurora aurora-a" aria-hidden="true"></div>
+  <div class="aurora aurora-b" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="site-bar">
+    <a class="brand" href="#" aria-label="Brain Speed home" id="brand-home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-word">BRAIN<span>SPEED</span></span>
+    </a>
+    <div class="site-status" aria-hidden="true">
+      <span class="status-dot"></span>
+      <span>COGNITIVE INSTRUMENT / ONLINE</span>
+    </div>
+    <button class="icon-button theme-toggle" id="theme-toggle" type="button" aria-label="Switch color theme">
+      <span class="theme-glyph theme-glyph-dark">◒</span>
+      <span class="theme-glyph theme-glyph-light">◐</span>
+    </button>
+  </header>
+
+  <main class="app-shell" id="app-shell">
+    <div class="instrument-frame">
+      <div class="frame-rail frame-rail-left" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="frame-rail frame-rail-right" aria-hidden="true"><span></span><span></span><span></span></div>
+
+      <section class="screen screen-active intro-screen" id="screen-intro" aria-labelledby="intro-title">
+        <div class="intro-grid">
+          <div class="intro-copy">
+            <div class="eyebrow"><span>NEURAL LATENCY BATTERY</span><b>BST–05</b></div>
+            <h1 id="intro-title">How fast does<br>your mind <em>move?</em></h1>
+            <p class="intro-lede">A focused five-part assessment of reaction speed, decision time, attention, short-term memory, and inhibitory control.</p>
+            <div class="intro-actions">
+              <button class="primary-button magnetic" id="start-battery" type="button">
+                <span>Begin assessment</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+              </button>
+              <div class="duration-chip"><span>≈ 4 min</span><small>No account required</small></div>
+            </div>
+          </div>
+
+          <div class="hero-orbit" aria-hidden="true">
+            <div class="orbit orbit-1"></div>
+            <div class="orbit orbit-2"></div>
+            <div class="orbit orbit-3"></div>
+            <div class="orbit-core">
+              <span class="core-number">05</span>
+              <span class="core-label">modules</span>
+            </div>
+            <span class="orbit-label label-a">REACTION</span>
+            <span class="orbit-label label-b">FOCUS</span>
+            <span class="orbit-label label-c">MEMORY</span>
+          </div>
+        </div>
+
+        <div class="module-strip" aria-label="Assessment modules">
+          <article class="module-card" data-index="01">
+            <span class="module-symbol symbol-bolt" aria-hidden="true"></span>
+            <div><h2>Reaction</h2><p>Visual response latency</p></div><b>5 trials</b>
+          </article>
+          <article class="module-card" data-index="02">
+            <span class="module-symbol symbol-choice" aria-hidden="true"></span>
+            <div><h2>Decision</h2><p>Four-choice processing</p></div><b>6 trials</b>
+          </article>
+          <article class="module-card" data-index="03">
+            <span class="module-symbol symbol-focus" aria-hidden="true"></span>
+            <div><h2>Focus</h2><p>Interference control</p></div><b>8 trials</b>
+          </article>
+          <article class="module-card" data-index="04">
+            <span class="module-symbol symbol-memory" aria-hidden="true"></span>
+            <div><h2>Memory</h2><p>Spatial sequence recall</p></div><b>Adaptive</b>
+          </article>
+          <article class="module-card" data-index="05">
+            <span class="module-symbol symbol-stop" aria-hidden="true"></span>
+            <div><h2>Control</h2><p>Response inhibition</p></div><b>15 trials</b>
+          </article>
+        </div>
+
+        <div class="evidence-bar">
+          <div class="evidence-icon" aria-hidden="true">∿</div>
+          <p><strong>Research-informed benchmarks.</strong> Comparisons draw on large reaction-time datasets and established Stroop, Corsi, and Go/No-Go paradigms.</p>
+          <span>159K+ reference sample</span>
+        </div>
+      </section>
+
+      <section class="screen test-screen" id="screen-srt" aria-labelledby="srt-title">
+        <div class="test-header">
+          <div><div class="eyebrow"><span>MODULE 01 / 05</span><b>LATENCY</b></div><h1 id="srt-title">Raw reaction speed</h1></div>
+          <div class="module-meter" aria-label="Assessment progress"><span style="--p:20%"></span><b>20%</b></div>
+        </div>
+        <div class="ready-panel" id="srt-ready">
+          <div class="ready-visual visual-reaction" aria-hidden="true"><div></div><span></span><span></span></div>
+          <div class="ready-copy"><span class="ready-code">VISUAL / MOTOR RESPONSE</span><h2>Tap the signal the instant it appears.</h2><p>The delay changes each round. Tapping before the signal appears restarts that round.</p><button class="primary-button" id="begin-srt" type="button"><span>Start module 01</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="test-run hidden" id="srt-run">
+          <div class="instruction-bar"><span>Tap the luminous target immediately</span><b id="srt-round">1 / 5</b></div>
+          <div class="trial-track" id="srt-track" aria-label="Reaction trials"></div>
+          <div class="test-arena reaction-arena" id="srt-arena">
+            <div class="arena-grid" aria-hidden="true"></div>
+            <div class="standby" id="srt-standby"><span class="scanner-ring"></span><b>STAND BY</b></div>
+            <button class="reaction-target hidden" id="srt-target" type="button" aria-label="Reaction target"><span></span><i></i></button>
+            <div class="feedback-flash" id="srt-feedback" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen test-screen" id="screen-crt" aria-labelledby="crt-title">
+        <div class="test-header">
+          <div><div class="eyebrow"><span>MODULE 02 / 05</span><b>CHOICE</b></div><h1 id="crt-title">Decision speed</h1></div>
+          <div class="module-meter"><span style="--p:40%"></span><b>40%</b></div>
+        </div>
+        <div class="ready-panel" id="crt-ready">
+          <div class="ready-visual visual-choice" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="ready-copy"><span class="ready-code">CHOICE REACTION TIME</span><h2>Find and tap the highlighted symbol.</h2><p>Four options appear. Only one activates each round. Accuracy and speed both matter.</p><button class="primary-button" id="begin-crt" type="button"><span>Start module 02</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="test-run hidden" id="crt-run">
+          <div class="instruction-bar"><span>Tap the active symbol</span><b id="crt-round">1 / 6</b></div>
+          <div class="trial-track" id="crt-track"></div>
+          <div class="test-arena choice-arena">
+            <div class="arena-grid" aria-hidden="true"></div>
+            <div class="standby" id="crt-standby"><span class="scanner-ring"></span><b>CALIBRATING CHOICE</b></div>
+            <div class="choice-grid hidden" id="choice-grid">
+              <button class="choice-button" type="button" data-choice="0" aria-label="Square"><span>■</span></button>
+              <button class="choice-button" type="button" data-choice="1" aria-label="Circle"><span>●</span></button>
+              <button class="choice-button" type="button" data-choice="2" aria-label="Triangle"><span>▲</span></button>
+              <button class="choice-button" type="button" data-choice="3" aria-label="Star"><span>★</span></button>
+            </div>
+            <div class="feedback-flash" id="crt-feedback" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen test-screen" id="screen-stroop" aria-labelledby="stroop-title">
+        <div class="test-header">
+          <div><div class="eyebrow"><span>MODULE 03 / 05</span><b>INTERFERENCE</b></div><h1 id="stroop-title">Colour focus</h1></div>
+          <div class="module-meter"><span style="--p:60%"></span><b>60%</b></div>
+        </div>
+        <div class="ready-panel" id="stroop-ready">
+          <div class="ready-visual visual-focus" aria-hidden="true"><span>RED</span><span>BLUE</span><span>GREEN</span></div>
+          <div class="ready-copy"><span class="ready-code">STROOP INTERFERENCE</span><h2>Respond to the ink, not the word.</h2><p>A color word appears in colored ink. Select the ink color while ignoring the word itself.</p><button class="primary-button" id="begin-stroop" type="button"><span>Start module 03</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="test-run hidden" id="stroop-run">
+          <div class="instruction-bar"><span>Select the ink colour</span><b id="stroop-round">1 / 8</b></div>
+          <div class="trial-track" id="stroop-track"></div>
+          <div class="test-arena stroop-arena">
+            <div class="arena-grid" aria-hidden="true"></div>
+            <div class="stroop-word" id="stroop-word">RED</div>
+            <div class="stroop-options">
+              <button type="button" data-color="RED">RED</button>
+              <button type="button" data-color="BLUE">BLUE</button>
+              <button type="button" data-color="GREEN">GREEN</button>
+              <button type="button" data-color="YELLOW">YELLOW</button>
+            </div>
+            <div class="inline-feedback" id="stroop-feedback" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen test-screen" id="screen-memory" aria-labelledby="memory-title">
+        <div class="test-header">
+          <div><div class="eyebrow"><span>MODULE 04 / 05</span><b>RECALL</b></div><h1 id="memory-title">Short-term memory</h1></div>
+          <div class="module-meter"><span style="--p:80%"></span><b>80%</b></div>
+        </div>
+        <div class="ready-panel" id="memory-ready">
+          <div class="ready-visual visual-memory" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="ready-copy"><span class="ready-code">SPATIAL SEQUENCE SPAN</span><h2>Watch the pattern. Repeat it exactly.</h2><p>The grid expands as you progress. You have three lives before the module ends.</p><button class="primary-button" id="begin-memory" type="button"><span>Start module 04</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="test-run hidden" id="memory-run">
+          <div class="instruction-bar"><span id="memory-instruction">Watch the pattern</span><b id="memory-phase">OBSERVE</b></div>
+          <div class="test-arena memory-arena"><div class="arena-grid" aria-hidden="true"></div><div class="memory-grid" id="memory-grid"></div></div>
+          <div class="metric-row">
+            <div><span>LEVEL</span><b id="memory-level">1</b></div>
+            <div><span>SCORE</span><b id="memory-score">0</b></div>
+            <div><span>LIVES</span><b id="memory-lives">● ● ●</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen test-screen" id="screen-gng" aria-labelledby="gng-title">
+        <div class="test-header">
+          <div><div class="eyebrow"><span>MODULE 05 / 05</span><b>INHIBITION</b></div><h1 id="gng-title">Self-control</h1></div>
+          <div class="module-meter"><span style="--p:100%"></span><b>100%</b></div>
+        </div>
+        <div class="ready-panel" id="gng-ready">
+          <div class="ready-visual visual-control" aria-hidden="true"><span class="go"></span><span class="stop"></span><i></i></div>
+          <div class="ready-copy"><span class="ready-code">GO / NO-GO CONTROL</span><h2>Tap green. Withhold on red.</h2><p>Respond quickly to green signals while suppressing the impulse to tap red signals.</p><button class="primary-button" id="begin-gng" type="button"><span>Start module 05</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="test-run hidden" id="gng-run">
+          <div class="instruction-bar"><span><i class="green-dot"></i> GREEN = TAP &nbsp;&nbsp; <i class="red-dot"></i> RED = HOLD</span><b id="gng-round">0 / 15</b></div>
+          <div class="trial-track compact" id="gng-track"></div>
+          <div class="test-arena control-arena">
+            <div class="arena-grid" aria-hidden="true"></div>
+            <div class="standby" id="gng-standby"><span class="scanner-ring"></span><b>STAND BY</b></div>
+            <button class="control-target hidden" id="gng-target" type="button" aria-label="Go or no-go target"><span id="gng-label"></span><i></i></button>
+            <div class="feedback-flash" id="gng-feedback" aria-live="polite"></div>
+          </div>
+          <div class="metric-row four">
+            <div><span>HITS</span><b id="gng-hits">0</b></div>
+            <div><span>MISSES</span><b id="gng-misses">0</b></div>
+            <div><span>FALSE TAPS</span><b id="gng-false">0</b></div>
+            <div><span>HELD BACK</span><b id="gng-held">0</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen results-screen" id="screen-results" aria-labelledby="results-title">
+        <div class="results-head">
+          <div><div class="eyebrow"><span>ASSESSMENT COMPLETE</span><b>BST–05</b></div><h1 id="results-title">Your cognitive readout</h1></div>
+          <button class="secondary-button" id="restart-top" type="button">Retake assessment</button>
+        </div>
+        <div id="results-content"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer"><span>BST / COGNITIVE LATENCY INSTRUMENT</span><span>Built for modern browsers</span></footer>
+  <script src="app.js"></script>
 </body>
 </html>
