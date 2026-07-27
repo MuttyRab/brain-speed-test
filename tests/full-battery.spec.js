@@ -55,16 +55,31 @@ test('complete cognitive battery works end to end', async ({ page }) => {
 
   await expect(page.locator('#screen-gng')).toHaveClass(/screen-active/);
   await page.click('#begin-gng');
-  for (let completed = 0; completed < 15; completed += 1) {
-    await page.locator('#gng-target:not(.hidden)').waitFor({ state: 'visible' });
+
+  let completed = 0;
+  while (completed < 15) {
+    await page.waitForFunction(() => {
+      const results = document.querySelector('#screen-results');
+      const target = document.querySelector('#gng-target');
+      return Boolean(results && results.classList.contains('screen-active')) ||
+        Boolean(target && !target.classList.contains('hidden'));
+    });
+
+    const resultsVisible = await page.locator('#screen-results').evaluate(el => el.classList.contains('screen-active'));
+    if (resultsVisible) break;
+
+    const before = await page.locator('#gng-round').evaluate(el => Number.parseInt(el.textContent, 10) || 0);
     const mode = await page.getAttribute('#gng-target', 'data-mode');
     if (mode === 'go') await page.dispatchEvent('#gng-target', 'pointerdown');
-    await page.waitForFunction(expected => {
+
+    await page.waitForFunction(previous => {
+      const results = document.querySelector('#screen-results');
+      if (results && results.classList.contains('screen-active')) return true;
       const round = document.querySelector('#gng-round');
-      const current = round ? Number.parseInt(round.textContent, 10) : 0;
-      return current >= expected || document.querySelector('#screen-results')?.classList.contains('screen-active');
-    }, completed + 1);
-    await page.waitForTimeout(25);
+      return Boolean(round) && (Number.parseInt(round.textContent, 10) || 0) > previous;
+    }, before);
+
+    completed = await page.locator('#gng-round').evaluate(el => Number.parseInt(el.textContent, 10) || 0);
   }
 
   await expect(page.locator('#screen-results')).toHaveClass(/screen-active/);
