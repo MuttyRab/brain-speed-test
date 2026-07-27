@@ -76,7 +76,7 @@
 
   function setTheme(light) {
     document.documentElement.classList.toggle('light', light);
-    document.querySelector('meta[name="theme-color"]').content = light ? '#ecebe6' : '#060812';
+    document.querySelector('meta[name="theme-color"]').content = light ? '#f4f7fb' : '#060812';
     try { localStorage.setItem('brain-speed-theme', light ? 'light' : 'dark'); } catch (_) {}
   }
   try { setTheme(localStorage.getItem('brain-speed-theme') === 'light'); } catch (_) {}
